@@ -18,13 +18,20 @@ import java.net.URI
 @Composable
 fun HyperlinkText(
     text: String,
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
     url: String,
-    urlColor: Color = Color.Blue,
+    urlColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     style: TextStyle = TextStyle()
 ) {
     val annotatedString = buildAnnotatedString {
+        pushStyle(
+            style = SpanStyle(
+                color = textColor
+            )
+        )
         append(text)
         append(" (")
+        pop()
         val startIndex = length
         pushStyle(
             style = SpanStyle(
@@ -40,7 +47,13 @@ fun HyperlinkText(
             end = startIndex + url.length
         )
         pop()
+        pushStyle(
+            style = SpanStyle(
+                color = textColor
+            )
+        )
         append(")")
+        pop()
     }
 
     ClickableText(

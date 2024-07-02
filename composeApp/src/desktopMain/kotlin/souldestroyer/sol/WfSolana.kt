@@ -4,11 +4,12 @@ import foundation.metaplex.rpc.RPC
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import souldestroyer.logs.LogRepository
+import souldestroyer.settings.SettingsManager
 
 class WfSolana(
     private val logRepository: LogRepository = LogRepository.instance()
 ) {
-    private var rpcEndpoint = RPCEndpoint.DEV_NET
+    var rpcEndpoint = SettingsManager().rpcEndpoint
     var rpc = RPC(rpcEndpoint.url)
 
     companion object {
@@ -35,6 +36,7 @@ class WfSolana(
             return@withContext try {
                 rpcEndpoint = newRPCEndpoint
                 rpc = RPC(rpcEndpoint.url)
+                SettingsManager().rpcEndpoint = newRPCEndpoint
                 logRepository.logSuccess(
                     message = "Changed RPC Endpoint to ${rpcEndpoint.description}."
                 )

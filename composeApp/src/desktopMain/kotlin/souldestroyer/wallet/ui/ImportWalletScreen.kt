@@ -28,11 +28,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
-import org.bitcoinj.core.Base58
-import org.bouncycastle.util.test.Test
 import souldestroyer.navigation.Screen
-import souldestroyer.sol.WalletCoder.encodeJsonFileWalletByteArrayPrivKey
-import souldestroyer.wallet.WalletRepository
 import souldestroyer.wallet.Wallets
 
 @Serializable
@@ -49,10 +45,10 @@ fun ImportWalletScreen(
     onCancel: () -> Unit
 ) {
     // State to hold the selected option
-    var selectedOption by remember { mutableStateOf(WalletImportSelectedMethod.PRIVATE_KEY) }
+    var selectedMethod by remember { mutableStateOf(WalletImportSelectedMethod.PRIVATE_KEY) }
     var mnemonic by remember { mutableStateOf(words) }
     var privateKeyString by remember { mutableStateOf("") }
-    var publicKeyString by remember { mutableStateOf("") }
+    var tagString by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -63,16 +59,14 @@ fun ImportWalletScreen(
             text = "Recover Wallet",
             style = MaterialTheme.typography.headlineLarge
         )
-
         Spacer(Modifier.height(24.dp))
 
-        ImportByRadioList(selectedOption) {
-            selectedOption = it
+        ImportMethodRadioList(selectedMethod) {
+            selectedMethod = it
         }
-
         Spacer(Modifier.height(24.dp))
 
-        when (selectedOption) {
+        when (selectedMethod) {
             // WORD LIST INPUT
             WalletImportSelectedMethod.MNEMONIC -> {
                 WordListImportInput(
@@ -83,29 +77,33 @@ fun ImportWalletScreen(
                 )
             }
             // PRIVATE KEY INPUT
-            WalletImportSelectedMethod.PRIVATE_KEY -> {
-                PrivateKeyInput(
-                    publicKeyString = publicKeyString,
-                    privateKeyString = privateKeyString,
-                    onPrivateKeyChanged = { inputString ->
-                        privateKeyString = encodeJsonFileWalletByteArrayPrivKey(inputString, privateKeyString)
+            WalletImportSelectedMethod.PRIVATE_KEY,
+            WalletImportSelectedMethod.BYTE_ARRAY -> {
+                SecretStringInput(
+                    tagString = tagString,
+                    secretString = privateKeyString,
+                    method = selectedMethod,
+                    onSecretStringChanged = {
+                        privateKeyString = it
                     },
-                    onPublicKeyChanged = {
-                        publicKeyString = it
+                    onTagChanged = {
+                        tagString = it
                     }
                 )
             }
         }
 
         Spacer(Modifier.height(24.dp))
-
         ActionButtons(
             onImport = {
-                when (selectedOption) {
-                    WalletImportSelectedMethod.MNEMONIC -> Wallets.get().walletFromMnemonic(mnemonic, "")
-                    WalletImportSelectedMethod.PRIVATE_KEY -> Wallets.get().walletFromPrivateKey(
-                        Base58.decode(privateKeyString)
-                    )
+                when (selectedMethod) {
+                    WalletImportSelectedMethod.MNEMONIC -> {
+                        Wallets.get().walletFromMnemonic(mnemonic, "")
+                    }
+                    WalletImportSelectedMethod.PRIVATE_KEY,
+                    WalletImportSelectedMethod.BYTE_ARRAY -> {
+                        Wallets.get().walletFromSecret(selectedMethod, tagString, privateKeyString)
+                    }
                 }
 
             },
@@ -148,7 +146,7 @@ private fun ActionButtons(
 }
 
 @Composable
-fun ImportByRadioList(
+private fun ImportMethodRadioList(
     selectedOption: WalletImportSelectedMethod,
     onSelectOption: (WalletImportSelectedMethod) -> Unit
 ) {
@@ -164,7 +162,8 @@ fun ImportByRadioList(
         Spacer(Modifier.height(4.dp))
 
         Text(
-            text = "Currently only supports restoring wallets from 32 byte Base58 encoded private keys.\n" +
+            text = "Currently only supports restoring wallets from base58 encoded private keys\n" +
+                    "or raw byte arrays, as found in wallet.json files.\n" +
                     "This might change with upcoming releases of the SolanaKMP library by Metaplex.",
             style = MaterialTheme.typography.bodySmall
         )
@@ -190,10 +189,24 @@ fun ImportByRadioList(
         ) {
             RadioButton(
                 selected = selectedOption == WalletImportSelectedMethod.PRIVATE_KEY,
-                onClick = { onSelectOption(WalletImportSelectedMethod.PRIVATE_KEY) }
+                onClick = { onSelectOption(WalletImportSelectedMethod.PRIVATE_KEY) },
+                enabled = true
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(WalletImportSelectedMethod.PRIVATE_KEY.string)
+        }
+
+        // Radio button for "From Byte Array"
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RadioButton(
+                selected = selectedOption == WalletImportSelectedMethod.BYTE_ARRAY,
+                onClick = { onSelectOption(WalletImportSelectedMethod.BYTE_ARRAY) },
+                enabled = true
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(WalletImportSelectedMethod.BYTE_ARRAY.string)
         }
     }
 }
@@ -241,11 +254,12 @@ fun WordListImportInput(
 }
 
 @Composable
-fun PrivateKeyInput(
-    publicKeyString: String,
-    privateKeyString: String,
-    onPrivateKeyChanged: (String) -> Unit,
-    onPublicKeyChanged: (String) -> Unit,
+fun SecretStringInput(
+    tagString: String,
+    secretString: String,
+    method: WalletImportSelectedMethod,
+    onSecretStringChanged: (String) -> Unit,
+    onTagChanged: (String) -> Unit,
 ) {
     val clipboardManager = LocalClipboardManager.current
 
@@ -264,22 +278,11 @@ fun PrivateKeyInput(
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                value = publicKeyString,
-                onValueChange = { onPublicKeyChanged(it) },
-                label = { Text("Public Key") },
+                value = tagString,
+                onValueChange = { onTagChanged(it) },
+                label = { Text("Tag") },
                 modifier = Modifier.fillMaxWidth(0.6f)
             )
-            Spacer(modifier = Modifier.width(16.dp))
-            OutlinedButton(
-                onClick = {
-                    val clipboardText = clipboardManager.getText()
-                    if (clipboardText != null) {
-                        onPublicKeyChanged(clipboardText.text)
-                    }
-                }
-            ) {
-                Text("Paste")
-            }
         }
 
         Row(
@@ -288,10 +291,11 @@ fun PrivateKeyInput(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val labelText = if (method == WalletImportSelectedMethod.PRIVATE_KEY) "Private Key" else "Byte Array []"
             OutlinedTextField(
-                value = privateKeyString,
-                onValueChange = { onPrivateKeyChanged(it) },
-                label = { Text("Private Key") },
+                value = secretString,
+                onValueChange = { onSecretStringChanged(it) },
+                label = { Text(labelText) },
                 modifier = Modifier.fillMaxWidth(0.6f)
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -299,7 +303,7 @@ fun PrivateKeyInput(
                 onClick = {
                     val clipboardText = clipboardManager.getText()
                     if (clipboardText != null) {
-                        onPrivateKeyChanged(clipboardText.text)
+                        onSecretStringChanged(clipboardText.text)
                     }
                 }
             ) {
@@ -311,7 +315,8 @@ fun PrivateKeyInput(
 
 enum class WalletImportSelectedMethod(val string: String) {
     MNEMONIC("From Word List"),
-    PRIVATE_KEY("From Private Key")
+    PRIVATE_KEY("From Private Key"),
+    BYTE_ARRAY("From Byte Secret")
 }
 
 private val words = listOf(

@@ -1,5 +1,6 @@
 package souldestroyer.settings
 
+import com.materialkolor.PaletteStyle
 import souldestroyer.sol.RPCEndpoint
 import java.util.prefs.Preferences
 
@@ -12,6 +13,7 @@ class SettingsManager {
         private const val KEY_CUSTOM_ENDPOINT = "custom_endpoint"
         private const val KEY_THEME_COLOR = "theme_color"
         private const val KEY_THEME_PALETTE = "theme_palette"
+        private const val KEY_THEME_DARK = "theme_dark"
     }
 
     var rpcEndpoint: RPCEndpoint
@@ -20,16 +22,22 @@ class SettingsManager {
             preferences.putInt(KEY_RPC_ENDPOINT, RPCEndpoint.entries.indexOf(value))
         }
 
-    var themeColor: Int?
-        get() = preferences.getInt(KEY_THEME_COLOR, 0)
+    var themeColor: Int
+        get() = preferences.getInt(KEY_THEME_COLOR, 7)
         set(value) {
-            preferences.putInt(KEY_THEME_COLOR, value ?: 0)
+            preferences.putInt(KEY_THEME_COLOR, value)
         }
 
-    var themePalette: Int?
-        get() = preferences.getInt(KEY_THEME_PALETTE, 0)
+    var themePalette: Int
+        get() = preferences.getInt(KEY_THEME_PALETTE, PaletteStyle.entries.indexOf(PaletteStyle.TonalSpot))
         set(value) {
-            preferences.putInt(KEY_THEME_PALETTE, value ?: 0)
+            preferences.putInt(KEY_THEME_PALETTE, value)
+        }
+
+    var darkTheme: Boolean
+        get() = preferences.getBoolean(KEY_THEME_DARK, false)
+        set(value) {
+            preferences.putBoolean(KEY_THEME_DARK, value)
         }
 
     fun clearSettings() {

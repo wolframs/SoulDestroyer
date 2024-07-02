@@ -129,6 +129,8 @@ fun WalletRow(
             Row {
                 RetrieveBalanceButton(publicKeyString)
                 Spacer(Modifier.width(16.dp))
+                MemoButton(publicKeyString)
+                Spacer(Modifier.width(32.dp))
                 RemoveButton(publicKeyString)
             }
 
@@ -173,6 +175,19 @@ private fun RemoveButton(publicKeyString: String) {
         }
     ) {
         Text("Remove")
+    }
+}
+
+@Composable
+private fun MemoButton(publicKeyString: String) {
+    Button(
+        onClick = {
+            Wallets.get().wList
+                .first { it.publicKey.toString() == publicKeyString }
+                .sendMemoInitTransaction()
+        }
+    ) {
+        Text("Memo Tx")
     }
 }
 

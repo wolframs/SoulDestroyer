@@ -13,14 +13,13 @@ object Transactioneer {
 
     suspend fun buildMemoTransaction(
         memo: String,
-        publicKey: PublicKey,
         signer: HotSigner
     ): Transaction {
         val recentBlockHash = rpc.getLatestBlockhash(null).blockhash
         return SolanaTransactionBuilder()
             .addInstruction(
                 MemoProgram.writeUtf8(
-                    publicKey, //PublicKey(wfWallet.publicKey),
+                    signer.publicKey,
                     memo
                 )
             )

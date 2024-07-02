@@ -16,6 +16,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,8 +32,6 @@ fun ThemeSettings(
     state: DynamicMaterialThemeState,
     sampleColors: List<Color>
 ) {
-    val settingsManager = SettingsManager()
-
 //    val borderColor = NavigationBarDefaults.containerColor
     Row(
 //        modifier = modifier
@@ -56,7 +55,9 @@ fun ThemeSettings(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             IconButton(
-                onClick = { state.isDark = !state.isDark },
+                onClick = {
+                    changeThemeIsDark(state)
+                },
                 modifier = Modifier.size(46.dp)
             ) {
                 val icon =
@@ -74,16 +75,20 @@ fun ThemeSettings(
         }
 
         Column {
-            ColorSelector(state, settingsManager, sampleColors)
-            PaletteSelector(state, settingsManager)
+            ColorSelector(state, sampleColors)
+            PaletteSelector(state)
         }
     }
+}
+
+private fun changeThemeIsDark(state: DynamicMaterialThemeState) {
+    state.isDark = !state.isDark
+    SettingsManager().darkTheme = state.isDark
 }
 
 @Composable
 private fun ColorSelector(
     state: DynamicMaterialThemeState,
-    settingsManager: SettingsManager,
     sampleColors: List<Color>
 ) {
     Row(
@@ -92,7 +97,7 @@ private fun ColorSelector(
         ArrowIconButton(
             direction = ArrowIconButtonDirection.LEFT,
             onClick = {
-                changeThemeSeedColor(sampleColors, state, settingsManager, ArrowIconButtonDirection.LEFT)
+                changeThemeSeedColor(sampleColors, state, ArrowIconButtonDirection.LEFT)
             }
         )
 
@@ -110,7 +115,7 @@ private fun ColorSelector(
         ArrowIconButton(
             direction = ArrowIconButtonDirection.RIGHT,
             onClick = {
-                changeThemeSeedColor(sampleColors, state, settingsManager, ArrowIconButtonDirection.RIGHT)
+                changeThemeSeedColor(sampleColors, state, ArrowIconButtonDirection.RIGHT)
             }
         )
     }
@@ -119,33 +124,29 @@ private fun ColorSelector(
 private fun changeThemeSeedColor(
     sampleColors: List<Color>,
     state: DynamicMaterialThemeState,
-    settingsManager: SettingsManager,
     direction: ArrowIconButtonDirection
 ) {
     var indexOfSeedColor = sampleColors.indexOf(state.seedColor)
 
     when (direction) {
         ArrowIconButtonDirection.LEFT -> {
-            state.seedColor =
-                sampleColors.getOrNull(sampleColors.indexOf(state.seedColor) - 1)
-                    ?: sampleColors[sampleColors.size - 1]
+            state.seedColor = sampleColors.getOrNull(sampleColors.indexOf(state.seedColor) - 1)
+                ?: sampleColors[sampleColors.size - 1]
         }
 
         ArrowIconButtonDirection.RIGHT -> {
-            state.seedColor =
-                sampleColors.getOrNull(indexOfSeedColor + 1)
-                    ?: sampleColors[0]
+            state.seedColor = sampleColors.getOrNull(indexOfSeedColor + 1)
+                ?: sampleColors[0]
         }
     }
 
     indexOfSeedColor = sampleColors.indexOf(state.seedColor)
-    settingsManager.themeColor = indexOfSeedColor
+    SettingsManager().themeColor = indexOfSeedColor
 }
 
 @Composable
 private fun PaletteSelector(
-    state: DynamicMaterialThemeState,
-    settingsManager: SettingsManager
+    state: DynamicMaterialThemeState
 ) {
     val styleEntries = PaletteStyle.entries
     Row(
@@ -154,7 +155,7 @@ private fun PaletteSelector(
         ArrowIconButton(
             direction = ArrowIconButtonDirection.LEFT,
             onClick = {
-                changeThemePalette(styleEntries, state, settingsManager, ArrowIconButtonDirection.LEFT)
+                changeThemePalette(styleEntries, state, ArrowIconButtonDirection.LEFT)
             }
         )
 
@@ -172,7 +173,7 @@ private fun PaletteSelector(
         ArrowIconButton(
             direction = ArrowIconButtonDirection.RIGHT,
             onClick = {
-                changeThemePalette(styleEntries, state, settingsManager, ArrowIconButtonDirection.RIGHT)
+                changeThemePalette(styleEntries, state, ArrowIconButtonDirection.RIGHT)
             }
         )
     }
@@ -181,27 +182,24 @@ private fun PaletteSelector(
 private fun changeThemePalette(
     styleEntries: EnumEntries<PaletteStyle>,
     state: DynamicMaterialThemeState,
-    settingsManager: SettingsManager,
     direction: ArrowIconButtonDirection
 ) {
     var indexOfPaletteEntry = styleEntries.indexOf(state.style)
 
     when (direction) {
         ArrowIconButtonDirection.LEFT -> {
-            state.style =
-                styleEntries.getOrNull(indexOfPaletteEntry - 1)
-                    ?: styleEntries[styleEntries.size - 1]
+            state.style = styleEntries.getOrNull(indexOfPaletteEntry - 1)
+                ?: styleEntries[styleEntries.size - 1]
         }
 
         ArrowIconButtonDirection.RIGHT -> {
-            state.style =
-                styleEntries.getOrNull(indexOfPaletteEntry + 1)
-                    ?: styleEntries[0]
+            state.style = styleEntries.getOrNull(indexOfPaletteEntry + 1)
+                ?: styleEntries[0]
         }
     }
 
     indexOfPaletteEntry = styleEntries.indexOf(state.style)
-    settingsManager.themePalette = indexOfPaletteEntry
+    SettingsManager().themePalette = indexOfPaletteEntry
 }
 
 @Composable

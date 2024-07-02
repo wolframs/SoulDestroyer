@@ -24,7 +24,7 @@ import souldestroyer.navigation.Screen
 import souldestroyer.sol.RPCEndpoint
 
 @Serializable
-object SettingsScreen: Screen {
+object SettingsScreen : Screen {
     override val label: String = "Settings"
     override val route = "/settings"
     override val iconImageVector: ImageVector = Icons.Filled.Settings
@@ -46,7 +46,9 @@ fun DebugScreen(paddingValues: PaddingValues) {
         Spacer(Modifier.height(24.dp))
 
         val availableRpcEndpoints = RPCEndpoint.entries
-        var selectedRPCEndpoint by remember { mutableStateOf(RPCEndpoint.DEV_NET) }
+        var selectedRPCEndpoint by remember {
+            mutableStateOf(SoulDestroyer.instance().solana.rpcEndpoint)
+        }
         var rpcEndpointRadioListEnabled by remember { mutableStateOf(true) }
         RPCEndpointRadioList(
             options = availableRpcEndpoints,

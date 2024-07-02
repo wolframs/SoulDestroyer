@@ -4,6 +4,9 @@ import souldestroyer.Constants
 import souldestroyer.sol.WfSolana
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableDoubleStateOf
+import foundation.metaplex.rpc.TransactionSignature
+import foundation.metaplex.solana.transactions.SerializedTransaction
+import foundation.metaplex.solana.transactions.Transaction
 import souldestroyer.database.dao.WalletDAO
 import souldestroyer.database.entity.WfWallet
 import foundation.metaplex.solanapublickeys.PublicKey
@@ -16,10 +19,13 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import org.bitcoinj.core.Base58
+import souldestroyer.SoulDestroyer
 import souldestroyer.logs.LogEntryType
 import souldestroyer.logs.LogRepository
 import souldestroyer.sol.HotSigner
 import souldestroyer.sol.Transactioneer
+import kotlin.system.measureTimeMillis
 
 class WalletImpl(
     val keypair: SolKeypair,
@@ -29,7 +35,7 @@ class WalletImpl(
 
     private val walletRepository: WalletRepository = WalletRepository.get()
     private val walletDAO: WalletDAO = walletRepository.walletDAO
-    private val wfSolana: WfSolana = WfSolana.get()
+    private val wfSolana: WfSolana = SoulDestroyer.instance().solana
 
     private val walletScope = CoroutineScope(Dispatchers.IO) + SupervisorJob()
     private var walletFlowJob: Job? = null
@@ -43,7 +49,8 @@ class WalletImpl(
 
     companion object {
         fun fromDatabaseWfWallet(wfWallet: WfWallet): WalletImpl {
-            val keypair = SolKeypair.fromPrivateKey(wfWallet.privateKey)
+            val keypair = SolKeypair.fromByteArray(wfWallet.privateKey)
+            val secret = Base58.encode(wfWallet.privateKey)
             return WalletImpl(keypair, wfWallet.tag)
         }
     }
@@ -117,34 +124,48 @@ class WalletImpl(
     }
 
     fun sendMemoInitTransaction() {
-        val memo = "SoulDestroyer initialized WalletImpl $publicKey"
+        val memo = "SoulDestroyer initialized Wallet $publicKey"
 
         logRepo.log(
-            message = "Launching Memo Init Transaction.\nBuilding Tx...",
+            message = "Launching Memo Transaction.\nBuilding Tx...",
             type = LogEntryType.INFO
         )
 
         walletScope.launch {
-            val transaction = Transactioneer.buildMemoTransaction(
-                memo = memo,
-                publicKey = publicKey,
-                signer = signer
-            )
+            val totalTimeMs = measureTimeMillis {
+                val transactionSignature: TransactionSignature
+                val transaction: Transaction
+                val serializedTransaction: SerializedTransaction
 
-            val serializedTransaction = transaction.serialize()
+                val buildTimeMs = measureTimeMillis {
+                    transaction = Transactioneer.buildMemoTransaction(
+                        memo = memo,
+                        signer = signer
+                    )
+                }
 
-            logRepo.log(
-                message = "Built and serialized transaction: $serializedTransaction\n\n" +
-                        "Sending transaction, waiting for signature from RPC...",
-                type = LogEntryType.INFO
-            )
+                val serializeTimeMs = measureTimeMillis {
+                    serializedTransaction = transaction.serialize()
+                }
 
-            val transactionSignature = wfSolana.rpc.sendTransaction(serializedTransaction, null)
+                logRepo.log(
+                    message = "Memo Tx was built ($buildTimeMs ms) and serialized ($serializeTimeMs ms).\n" +
+                            "Sending transaction, waiting for signature from RPC...",
+                    type = LogEntryType.INFO
+                )
 
-            logRepo.log(
-                message = "Transaction signature received: $transactionSignature",
-                type = LogEntryType.SUCCESS
-            )
+                val sendTimeMs = measureTimeMillis {
+                    transactionSignature = wfSolana.rpc.sendTransaction(serializedTransaction, null)
+                }
+
+                val signatureResponseString = transactionSignature.decodeToString()
+
+                logRepo.logSuccess(
+                    message = "(Tx total ms to signature: ${buildTimeMs + serializeTimeMs + sendTimeMs} ms)\n" +
+                            "Memo Tx signature received ($sendTimeMs ms):\n\n" +
+                            signatureResponseString
+                )
+            }
         }
     }
 
@@ -172,10 +193,14 @@ class WalletImpl(
                     try {
                         walletsList.remove(wallet)
                     } catch (e: Throwable) {
-                        logRepo.logError("Could not remove wallet with tag $tag from WalletImplList. " + e.message)
+                        logRepo.logError("Could not remove wallet with tag $tag from wallet list state holder. " + e.message)
                     }
                 }
             }
         }
+    }
+
+    fun requestAirdrop() {
+
     }
 }

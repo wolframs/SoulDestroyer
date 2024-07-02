@@ -4,6 +4,7 @@ import foundation.metaplex.solanaeddsa.Keypair
 import foundation.metaplex.solanaeddsa.SolanaEddsa
 import foundation.metaplex.solanapublickeys.PublicKey
 import kotlinx.coroutines.runBlocking
+import org.bitcoinj.core.Base58
 import souldestroyer.logs.LogEntryType
 import souldestroyer.logs.LogRepository
 
@@ -13,7 +14,19 @@ class SolKeypair(override val publicKey: PublicKey, override val secretKey: Byte
         private val logRepo = LogRepository.instance()
         private val edDSA = SolanaEddsa
 
-        fun fromPrivateKey(secretKey: ByteArray): SolKeypair {
+        fun fromPrivateKey(privateKeyString: String): SolKeypair {
+            logRepo.log(
+                message = "Calculating keypair from encoded secret key string...",
+                type = LogEntryType.INFO
+            )
+            return runBlocking {
+                val secretAsByteArray = Base58.decode(privateKeyString)
+                val keypair = edDSA.createKeypairFromSecretKey(secretAsByteArray)
+                return@runBlocking SolKeypair(keypair.publicKey, keypair.secretKey)
+            }
+        }
+
+        fun fromByteArray(secretKey: ByteArray): SolKeypair {
             logRepo.log(
                 message = "Calculating keypair from encoded secret key string...",
                 type = LogEntryType.INFO

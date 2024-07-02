@@ -9,6 +9,7 @@ import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -20,7 +21,9 @@ class WalletRepository(
 ) : DisposableHandle {
     private val walletIOScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    val walletListState = walletDAO.getAllInFlow().map { WalletListState(it) }
+    val walletListState = walletDAO.getAllInFlow()
+        .distinctUntilChanged()
+        .map { WalletListState(it) }
         .stateIn(
             scope = walletIOScope,
             started = SharingStarted.WhileSubscribed(5_000L),
@@ -28,7 +31,6 @@ class WalletRepository(
         )
 
     private val _wallets = CopyOnWriteArrayList<WfWallet>()
-    val wallets: List<WfWallet> get() = _wallets
 
     companion object {
         @Volatile

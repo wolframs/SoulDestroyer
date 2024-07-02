@@ -8,8 +8,8 @@ import souldestroyer.sol.WfSolana
 import souldestroyer.wallet.Wallets
 
 class SoulDestroyer(
-    val wallets: Wallets = Wallets.get(),
     val solana: WfSolana = WfSolana.get(),
+    val wallets: Wallets = Wallets.get(),
     val soulScope: CoroutineScope = CoroutineScope(Dispatchers.Default) + SupervisorJob()
 ) {
     companion object {

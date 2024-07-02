@@ -17,7 +17,6 @@ kotlin {
 
         val metaplexSolanaVersion = "0.2.10"
         val serializationVersion = "1.7.0"
-        val solanaKtVersion = "2.1.1"
         
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -58,6 +57,7 @@ kotlin {
             // Crypto
             implementation("org.bitcoinj:bitcoinj-core:0.16.2")
             implementation("net.i2p.crypto:eddsa:0.3.0")
+            implementation("com.diglol.crypto:pkc:0.2.0")
 
             // OkHttp3
             implementation("com.squareup.okhttp3:okhttp:4.9.0")

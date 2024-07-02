@@ -23,6 +23,7 @@ import souldestroyer.navigation.Screen
 import souldestroyer.navigation.WfNavHost
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import souldestroyer.SoulDestroyer
+import souldestroyer.settings.SettingsManager
 import theme.AppTheme
 import souldestroyer.wallet.ui.WalletScreen
 
@@ -54,21 +55,23 @@ fun App() {
         Color(0xFF263238),
     )
 
-    val isDarkTheme = false
-    var seedColor by rememberSaveable { mutableStateOf(SampleColors[7].toArgb()) }
-    var style by rememberSaveable { (mutableStateOf(PaletteStyle.TonalSpot.name)) }
+    val isDarkTheme = SettingsManager().darkTheme
+    val seedColor by rememberSaveable {
+        mutableStateOf(SampleColors[SettingsManager().themeColor ?: 7])
+    }
+    val style by rememberSaveable {
+        mutableStateOf(PaletteStyle.entries[SettingsManager().themePalette])
+    }
     val themeState = rememberDynamicMaterialThemeState(
-        seedColor = Color(seedColor),
+        seedColor = seedColor,
         isDark = isDarkTheme,
-        style = PaletteStyle.valueOf(style),
+        style = style,
     )
 
     AppTheme(
         state = themeState
     ) {
         val mainScreens: List<Screen> = listOf(MainScreen, WalletScreen, SettingsScreen)
-
-        //val soulDestroyer: souldestroyer.SoulDestroyer = souldestroyer.SoulDestroyer()
 
         //var showContent by remember { mutableStateOf(false) }
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
