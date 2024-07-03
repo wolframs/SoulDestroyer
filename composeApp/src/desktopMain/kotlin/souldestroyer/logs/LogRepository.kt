@@ -24,7 +24,7 @@ import souldestroyer.logs.model.LogListModel
 
 class LogRepository(
     private val logDAO: LogDAO = DatabaseModule.getLogDAO()
-): DisposableHandle {
+) : DisposableHandle {
     private val logIOScope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     companion object {
@@ -65,27 +65,60 @@ class LogRepository(
         }
     }
 
-    fun logInfo(message: String) {
-        log(message = message, type = LogEntryType.INFO)
+    fun logInfo(
+        message: String,
+        keys: List<String> = emptyList(),
+        values: List<String> = emptyList()
+    ) {
+        log(message = message, type = LogEntryType.INFO, keys = keys, values = values)
     }
 
-    fun logWarning(message: String) {
-        log(message = message, type = LogEntryType.WARNING)
+    fun logWarning(
+        message: String,
+        keys: List<String> = emptyList(),
+        values: List<String> = emptyList()
+    ) {
+        log(message = message, type = LogEntryType.WARNING, keys = keys, values = values)
     }
 
-    fun logError(message: String) {
-        log(message = message, type = LogEntryType.ERROR)
+    fun logError(
+        message: String,
+        keys: List<String> = emptyList(),
+        values: List<String> = emptyList()
+    ) {
+        log(message = message, type = LogEntryType.ERROR, keys = keys, values = values)
     }
 
-    fun logSuccess(message: String) {
-        log(message = message, type = LogEntryType.SUCCESS)
+    fun logSuccess(
+        message: String,
+        keys: List<String> = emptyList(),
+        values: List<String> = emptyList()
+    ) {
+        log(message = message, type = LogEntryType.SUCCESS, keys = keys, values = values)
     }
 
-    fun log(message: String, type: LogEntryType, localDateTime: LocalDateTime? = null) {
+    fun log(
+        message: String,
+        type: LogEntryType,
+        keys: List<String> = emptyList(),
+        values: List<String> = emptyList()
+    ) {
         logIOScope.launch {
+            val keysCount = keys.count()
+            val valuesCount = values.count()
+            if (keysCount != valuesCount) {
+                logDAO.insert(
+                    LogEntry(
+                        message = "Could not insert log entry '$message', because count of keys (${keys.count()}) did " +
+                                "not match count of values (${values.count()}).",
+                        type = LogEntryType.WARNING
+                    )
+                )
+                return@launch
+            }
             logDAO.insert(
-                if (localDateTime != null)
-                    LogEntry(dateTime = localDateTime, message = message, type = type)
+                if (keysCount + valuesCount >= 2)
+                    LogEntry(message = message, type = type, keys = keys, values = values)
                 else
                     LogEntry(message = message, type = type)
             )

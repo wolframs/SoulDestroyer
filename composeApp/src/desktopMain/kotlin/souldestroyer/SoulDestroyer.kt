@@ -30,7 +30,7 @@ class SoulDestroyer(
         LogRepository.instance().logWarning(
             "SoulDestroyer is still inherently INSECURE.\n" +
                     "\n" +
-                    "Wallet secrets are not stored in encrypted form and are held on a local database on your machine. " +
+                    "Wallet secrets are not stored in encrypted form and are held in a local database on your machine. " +
                     "Someone who can get a hold of said database could extract the secrets.\n" +
                     "\n" +
                     "Do not store substantial amounts of SOL in any wallet which you add to the wallet list in this app."

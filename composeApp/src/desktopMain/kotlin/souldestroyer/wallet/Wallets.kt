@@ -47,16 +47,6 @@ class Wallets(
                     wList.add(walletToAdd)
                 }
             }
-
-            logRepo.logInfo(
-                message = "WalletImplList instantiated." +
-                        if (wList.isNotEmpty()) {
-                            "\n\n- " +
-                                    wList.joinToString(separator = "\n\n- ") {
-                                        it.toString()
-                                    }
-                        } else ""
-            )
         }
     }
 

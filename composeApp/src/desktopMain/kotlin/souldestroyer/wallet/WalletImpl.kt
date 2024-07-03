@@ -48,18 +48,26 @@ class WalletImpl(
     }
 
     init {
-        logRepo.log(
-            message = "Instantiating Wallet:\n" +
-                    "PublicKey: ${keypair.publicKey}\n" +
-                    "PrivateKey: ${if (keypair.secretKey.isNotEmpty()) "Exists." else "Empty!"}",
-            type = LogEntryType.INFO
-        )
         publicKey = keypair.publicKey
         signer = HotSigner(keypair)
 
-        WalletManager.insertToDatabaseIfNotExists(keypair, tag) {
-            startWalletFlow(keypair.publicKey.toString())
-            retrieveBalance()
+        try {
+            WalletManager.insertToDatabaseIfNotExists(keypair, tag) {
+                startWalletFlow(keypair.publicKey.toString())
+                retrieveBalance()
+            }
+
+            logRepo.logSuccess(
+                message = "Initialized Wallet.",
+                keys = listOf("Tag", "Public Key"),
+                values = listOf(tag, keypair.publicKey.toString())
+            )
+        } catch (e: Throwable) {
+            logRepo.logError(
+                message = "Initializing wallet failed.",
+                keys = listOf("Tag", "Public Key", "Error"),
+                values = listOf(tag, keypair.publicKey.toString(), e.message ?: "Unknown error.")
+            )
         }
     }
 

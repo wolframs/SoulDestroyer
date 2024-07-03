@@ -55,9 +55,9 @@ fun sendMemoTransaction(
             val signatureResponseString = transactionSignature.decodeToString()
 
             logRepo.logSuccess(
-                message = "(Tx total ms to signature: ${buildTimeMs + serializeTimeMs + sendTimeMs} ms)\n" +
-                        "Memo Tx signature received ($sendTimeMs ms):\n\n" +
-                        signatureResponseString
+                message = "Memo transaction successful.",
+                keys = listOf("Signature", "Response time", "Tx time total"),
+                values = listOf(signatureResponseString, "$sendTimeMs ms", "${buildTimeMs + serializeTimeMs + sendTimeMs} ms")
             )
         }
     }

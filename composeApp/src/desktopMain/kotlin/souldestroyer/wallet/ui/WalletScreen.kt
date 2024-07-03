@@ -148,17 +148,24 @@ private fun PublicKeyRow(
             text = publicKeyString,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier.clickable(
-                onClick = {
-                    clipboardManager.setText(AnnotatedString(publicKeyString))
-                }
-            )
+            modifier = Modifier
+                .clickable(
+                    onClick = {
+                        clipboardManager.setText(AnnotatedString(publicKeyString))
+                    }
+                )
         )
         Icon(
             imageVector = Icons.Outlined.CopyAll,
             contentDescription = "",
             tint = Color.Gray,
-            modifier = Modifier.size(MaterialTheme.typography.labelMedium.fontSize.value.dp)
+            modifier = Modifier
+                .size(MaterialTheme.typography.labelMedium.fontSize.value.dp)
+                .clickable(
+                    onClick = {
+                        clipboardManager.setText(AnnotatedString(publicKeyString))
+                    }
+                )
         )
     }
 }
