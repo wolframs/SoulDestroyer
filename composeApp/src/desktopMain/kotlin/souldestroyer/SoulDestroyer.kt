@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.plus
+import souldestroyer.logs.LogRepository
 import souldestroyer.sol.WfSolana
 import souldestroyer.wallet.Wallets
 
@@ -23,5 +24,16 @@ class SoulDestroyer(
                 instance
             }
         }
+    }
+
+    init {
+        LogRepository.instance().logWarning(
+            "SoulDestroyer is still inherently INSECURE.\n" +
+                    "\n" +
+                    "Wallet secrets are not stored in encrypted form and are held on a local database on your machine. " +
+                    "Someone who can get a hold of said database could extract the secrets.\n" +
+                    "\n" +
+                    "Do not store substantial amounts of SOL in any wallet which you add to the wallet list in this app."
+        )
     }
 }

@@ -59,7 +59,7 @@ fun LogEntryRow(
         Spacer(modifier = Modifier.width(6.dp))
 
         Column(
-            modifier = Modifier.padding(top = 2.dp, bottom = 6.dp)
+            modifier = Modifier.padding(top = 2.dp, bottom = 6.dp, end = 6.dp)
         ) {
             Text(
                 text = dateTime.time.format(wfDateTimeFormat),
