@@ -3,13 +3,14 @@ package souldestroyer.wallet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import souldestroyer.logs.LogEntryType
 import souldestroyer.logs.LogRepository
-import souldestroyer.wallet.ui.WalletImportSelectedMethod
+import souldestroyer.wallet.domain.WalletImportSelectedMethod
+import souldestroyer.wallet.domain.WalletManager
 
 class Wallets(
     private val logRepo: LogRepository = LogRepository.instance(),
-    private val walletRepository: WalletRepository = WalletRepository.get()
+    private val walletRepository: WalletRepository = WalletRepository.instance(),
+    val manager: WalletManager = WalletManager
 ) {
     val wList: MutableList<WalletImpl> = mutableListOf()
 
@@ -17,7 +18,7 @@ class Wallets(
         @Volatile
         private var INSTANCE: Wallets? = null
 
-        fun get(): Wallets {
+        fun instance(): Wallets {
             return INSTANCE ?: synchronized(this) {
                 val instance = Wallets()
                 INSTANCE = instance
@@ -59,59 +60,15 @@ class Wallets(
         }
     }
 
-    fun createWallet(tag: String) {
-        val keypair = SolKeypair.generate()
-        wList.add(
-            WalletImpl(keypair, tag)
-        )
+    fun createNew(tag: String) {
+        WalletManager.newWallet(tag)
     }
 
-    fun walletFromSecret(method: WalletImportSelectedMethod, tag: String, secretString: String) {
-        try {
-            val keypair: SolKeypair = when (method) {
-                WalletImportSelectedMethod.PRIVATE_KEY -> {
-                    SolKeypair.fromPrivateKey(secretString)
-                }
-
-                WalletImportSelectedMethod.BYTE_ARRAY -> {
-                    val byteArray = secretString
-                        .trim()
-                        .removeSurrounding("[", "]")
-                        .split(",")
-                        .map { it.toInt().toByte() }
-                        .take(32)
-                        .toByteArray()
-                    SolKeypair.fromByteArray(byteArray)
-                }
-
-                else -> throw IllegalArgumentException("Mnemonics can't be handled by walletFromPrivateKey()")
-            }
-
-            val wallet = WalletImpl(
-                keypair = keypair,
-                tag = tag
-            )
-
-            wallet.sendMemoInitTransaction()
-        } catch (e: Throwable) {
-            LogRepository.instance().log(
-                message = e.message ?: "walletFromMnemonic() failed.",
-                type = LogEntryType.ERROR
-            )
-        }
+    fun createFromSecret(method: WalletImportSelectedMethod, tag: String, secretString: String) {
+        WalletManager.walletFromSecret(method, tag, secretString)
     }
 
-    fun walletFromMnemonic(mnemonic: List<String>, passphrase: String) {
-        try {
-            /*val test = HotAccount.fromMnemonic(
-                words = mnemonic,
-                passphrase = passphrase
-            )*/
-        } catch (e: Throwable) {
-            LogRepository.instance().log(
-                message = e.message ?: "walletFromMnemonic() failed.",
-                type = LogEntryType.ERROR
-            )
-        }
+    fun createFromMnemonic(mnemonic: List<String>, passphrase: String) {
+        WalletManager.walletFromMnemonic(mnemonic, passphrase)
     }
 }

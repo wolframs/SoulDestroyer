@@ -1,6 +1,6 @@
 package souldestroyer.database.dao
 
-import souldestroyer.database.entity.WfWallet
+import souldestroyer.wallet.model.WfWallet
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -10,26 +10,32 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WalletDAO {
-    @Query("SELECT EXISTS(SELECT * FROM wfwallet WHERE publicKey = :publicKeyString)")
-    suspend fun doesWalletExist(publicKeyString: String) : Boolean
-
-    @Query("SELECT * FROM wfwallet")
-    fun getAllInFlow(): Flow<List<WfWallet>>
-
     @Query("SELECT * FROM wfwallet")
     suspend fun getAll(): List<WfWallet>
+
+    @Query("SELECT * FROM wfwallet WHERE publicKey = :publicKeyString LIMIT 1")
+    suspend fun get(publicKeyString: String): WfWallet
 
     @Query("SELECT COUNT(*) FROM wfwallet")
     suspend fun getCount(): Int
 
+    @Query("SELECT EXISTS(SELECT * FROM wfwallet WHERE publicKey = :publicKeyString)")
+    suspend fun doesWalletExist(publicKeyString: String) : Boolean
+
     @Query("SELECT * FROM wfwallet WHERE publicKey = :publicKeyString LIMIT 1")
     fun loadWallet(publicKeyString: String): Flow<WfWallet>
+
+    @Query("SELECT * FROM wfwallet")
+    fun getAllInFlow(): Flow<List<WfWallet>>
 
     @Query("UPDATE wfwallet SET balance = :balance WHERE publicKey = :publicKeyString")
     suspend fun updateBalance(publicKeyString: String, balance: Double)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg wfWallets: WfWallet)
+
+    @Query("DELETE FROM wfwallet WHERE publicKey = :publicKeyString")
+    suspend fun delete(publicKeyString: String)
 
     @Delete
     suspend fun delete(wfWallet: WfWallet)

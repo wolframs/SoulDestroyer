@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.onClick
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -32,13 +31,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import souldestroyer.database.entity.WfWallet
+import souldestroyer.wallet.model.WfWallet
 import kotlinx.serialization.Serializable
-import souldestroyer.wallet.WalletRepository
 import souldestroyer.wallet.Wallets
+import souldestroyer.wallet.domain.WalletManager
+import souldestroyer.wallet.domain.transaction.sendMemoTransaction
 
 @Serializable
 object WalletScreen : Screen {
@@ -169,7 +167,7 @@ private fun PublicKeyRow(
 private fun RemoveButton(publicKeyString: String) {
     OutlinedButton(
         onClick = {
-            Wallets.get().wList
+            Wallets.instance().wList
                 .first { it.publicKey.toString() == publicKeyString }
                 .remove()
         }
@@ -182,9 +180,12 @@ private fun RemoveButton(publicKeyString: String) {
 private fun MemoButton(publicKeyString: String) {
     Button(
         onClick = {
-            Wallets.get().wList
-                .first { it.publicKey.toString() == publicKeyString }
-                .sendMemoInitTransaction()
+            WalletManager.getByPublicKey(publicKeyString)?.let { wallet ->
+                sendMemoTransaction(
+                    memoText = "SoulDestroyer Wallet ${wallet.publicKey} says hi.",
+                    signer = wallet.signer
+                )
+            }
         }
     ) {
         Text("Memo Tx")
@@ -195,7 +196,7 @@ private fun MemoButton(publicKeyString: String) {
 private fun RetrieveBalanceButton(publicKeyString: String) {
     Button(
         onClick = {
-            Wallets.get().wList
+            Wallets.instance().wList
                 .first { it.publicKey.toString() == publicKeyString }
                 .retrieveBalance()
         }

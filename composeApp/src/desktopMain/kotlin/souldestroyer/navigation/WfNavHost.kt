@@ -36,7 +36,7 @@ fun WfNavHost(
             DebugScreen(paddingValues = paddingValues)
         }
         composable(route = WalletScreen.route) {
-            val walletListState by WalletRepository.get().walletListState.collectAsState()
+            val walletListState by WalletRepository.instance().walletListModel.collectAsState()
             WalletScreen(
                 paddingValues = paddingValues,
                 wallets = walletListState.logList,

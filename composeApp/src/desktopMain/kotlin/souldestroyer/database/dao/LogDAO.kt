@@ -1,6 +1,6 @@
 package souldestroyer.database.dao
 
-import souldestroyer.database.entity.LogEntry
+import souldestroyer.logs.model.LogEntry
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query

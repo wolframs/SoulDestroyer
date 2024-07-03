@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import souldestroyer.database.entity.LogEntry
+import souldestroyer.logs.model.LogEntry
 import souldestroyer.simpleVerticalScrollbar
 
 @Composable

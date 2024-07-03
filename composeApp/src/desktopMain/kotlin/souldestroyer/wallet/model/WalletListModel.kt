@@ -1,7 +1,5 @@
 package souldestroyer.wallet.model
 
-import souldestroyer.database.entity.WfWallet
-
-data class WalletListState(
+data class WalletListModel(
     val logList: List<WfWallet> = listOf()
 )

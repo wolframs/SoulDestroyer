@@ -1,4 +1,4 @@
-package souldestroyer.database.entity
+package souldestroyer.logs.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -21,11 +21,4 @@ data class LogEntry(
     val type: LogEntryType
 )
 
-fun getLogIconAccordingToType(logEntryType: LogEntryType): ImageVector {
-    return when (logEntryType) {
-        LogEntryType.INFO -> Icons.Default.Info
-        LogEntryType.WARNING -> Icons.Default.Warning
-        LogEntryType.ERROR -> Icons.Default.Close
-        LogEntryType.SUCCESS -> Icons.Default.ThumbUp
-    }
-}
+

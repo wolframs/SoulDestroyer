@@ -36,7 +36,7 @@ fun SideDisplaySection(
     ) {
         val logListBackgroundColor = modColor(
             color = MaterialTheme.colorScheme.secondaryContainer,
-            brightenBy = -0.1f
+            brightenBy = -0.375f
         )
         val conInfoBackgroundColor = modColor(
             color = MaterialTheme.colorScheme.secondaryContainer,

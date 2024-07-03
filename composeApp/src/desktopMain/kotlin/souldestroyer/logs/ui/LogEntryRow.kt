@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,10 +19,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import souldestroyer.database.entity.getLogIconAccordingToType
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format
 import souldestroyer.logs.LogEntryType
+import souldestroyer.logs.ui.LogEntryStyle.getLogEntryRowBackgroundColor
+import souldestroyer.logs.ui.LogEntryStyle.getLogEntryRowColor
+import souldestroyer.logs.ui.LogEntryStyle.getLogIconAccordingToType
 import souldestroyer.logs.wfDateTimeFormat
 
 @Composable
@@ -78,28 +79,4 @@ fun LogEntryRow(
             )
         }
     }
-}
-
-@Composable
-private fun getLogEntryRowColor(type: LogEntryType) = when (type) {
-    LogEntryType.ERROR -> MaterialTheme.colorScheme.onErrorContainer
-    LogEntryType.WARNING -> MaterialTheme.colorScheme.onTertiary/*modColor(
-        MaterialTheme.colorScheme.onErrorContainer,
-        desaturateBy = 0.5f
-    )*/
-
-    LogEntryType.SUCCESS -> MaterialTheme.colorScheme.onTertiaryContainer
-    else -> MaterialTheme.colorScheme.onSecondary
-}
-
-@Composable
-private fun getLogEntryRowBackgroundColor(type: LogEntryType) = when (type) {
-    LogEntryType.ERROR -> MaterialTheme.colorScheme.errorContainer
-    LogEntryType.WARNING -> MaterialTheme.colorScheme.tertiary/*modColor(
-        MaterialTheme.colorScheme.errorContainer,
-        desaturateBy = 0.5f
-    )*/
-
-    LogEntryType.SUCCESS -> MaterialTheme.colorScheme.tertiaryContainer
-    else -> MaterialTheme.colorScheme.secondary
 }

@@ -9,8 +9,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import souldestroyer.database.dao.LogDAO
 import souldestroyer.database.dao.WalletDAO
-import souldestroyer.database.entity.LogEntry
-import souldestroyer.database.entity.WfWallet
+import souldestroyer.logs.model.LogEntry
+import souldestroyer.wallet.model.WfWallet
 
 @Database(
     entities = [

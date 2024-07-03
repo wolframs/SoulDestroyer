@@ -12,11 +12,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import jdk.jfr.Enabled
-import souldestroyer.shared.ui.HyperlinkText
+import androidx.compose.ui.unit.sp
+import souldestroyer.shared.ui.TextWithHyperlinkParenthesis
 import souldestroyer.sol.RPCEndpoint
-import souldestroyer.wallet.ui.WalletImportSelectedMethod
 
 @Composable
 fun RPCEndpointRadioList(
@@ -39,7 +39,7 @@ fun RPCEndpointRadioList(
             text = "This decides through which RPC node the app tries to interact with the Solana blockchain.\n" +
                     "A different node can mean a different blockchain. Your wallets in this app's database likely only exist on either one of the chains.\n" +
                     "\n" +
-                    "The RPC node decides, which chain is interacted with. The default options interact with either the" +
+                    "The RPC node decides, which chain is interacted with. The default options interact with either the " +
                     "public Solana DevNet or TestNet, which use worthless and limitless SOL, or the MainNet, which uses real SOL.",
             style = MaterialTheme.typography.bodySmall
         )
@@ -73,11 +73,12 @@ private fun RPCEndpointRadioButtonRow(
             onClick = { onSelectOption(thisRpcEndpoint) },
             enabled = enabled
         )
-        Spacer(modifier = Modifier.width(8.dp))
-        HyperlinkText(
-            text = thisRpcEndpoint.description,
-            url = thisRpcEndpoint.url,
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Spacer(modifier = Modifier.width(2.dp))
+            TextWithHyperlinkParenthesis(
+                modifier = Modifier.padding(bottom = 3.dp),
+                text = thisRpcEndpoint.description,
+                url = thisRpcEndpoint.url,
+                style = TextStyle.Default.copy(fontSize = 16.sp)
+            )
     }
 }

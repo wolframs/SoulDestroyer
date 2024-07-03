@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import souldestroyer.navigation.Screen
 import souldestroyer.wallet.Wallets
+import souldestroyer.wallet.domain.WalletImportSelectedMethod
 
 @Serializable
 object ImportWalletScreen : Screen {
@@ -46,7 +47,7 @@ fun ImportWalletScreen(
 ) {
     // State to hold the selected option
     var selectedMethod by remember { mutableStateOf(WalletImportSelectedMethod.PRIVATE_KEY) }
-    var mnemonic by remember { mutableStateOf(words) }
+    var mnemonic: List<String> by remember { mutableStateOf(listOf("")) }
     var privateKeyString by remember { mutableStateOf("") }
     var tagString by remember { mutableStateOf("") }
 
@@ -98,11 +99,11 @@ fun ImportWalletScreen(
             onImport = {
                 when (selectedMethod) {
                     WalletImportSelectedMethod.MNEMONIC -> {
-                        Wallets.get().walletFromMnemonic(mnemonic, "")
+                        Wallets.instance().createFromMnemonic(mnemonic, "")
                     }
                     WalletImportSelectedMethod.PRIVATE_KEY,
                     WalletImportSelectedMethod.BYTE_ARRAY -> {
-                        Wallets.get().walletFromSecret(selectedMethod, tagString, privateKeyString)
+                        Wallets.instance().createFromSecret(selectedMethod, tagString, privateKeyString)
                     }
                 }
 
@@ -313,35 +314,3 @@ fun SecretStringInput(
     }
 }
 
-enum class WalletImportSelectedMethod(val string: String) {
-    MNEMONIC("From Word List"),
-    PRIVATE_KEY("From Private Key"),
-    BYTE_ARRAY("From Byte Secret")
-}
-
-private val words = listOf(
-    "hint",
-    "begin",
-    "crowd",
-    "dolphin",
-    "drive",
-    "render",
-    "finger",
-    "above",
-    "sponsor",
-    "prize",
-    "runway",
-    "invest",
-    "dizzy",
-    "pony",
-    "bitter",
-    "trial",
-    "ignore",
-    "crop",
-    "please",
-    "industry",
-    "hockey",
-    "wire",
-    "jeep",
-    "meep"
-)

@@ -2,7 +2,7 @@ package souldestroyer.logs
 
 import souldestroyer.database.DatabaseModule
 import souldestroyer.database.dao.LogDAO
-import souldestroyer.database.entity.LogEntry
+import souldestroyer.logs.model.LogEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.DisposableHandle
@@ -20,6 +20,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
+import souldestroyer.logs.model.LogListModel
 
 class LogRepository(
     private val logDAO: LogDAO = DatabaseModule.getLogDAO()
@@ -47,11 +48,11 @@ class LogRepository(
     fun logList() = logDAO
         .loadLatestLog()
         .distinctUntilChanged()
-        .map { LogListState(it) }
+        .map { LogListModel(it) }
         .stateIn(
             scope = logIOScope,
             started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = LogListState()
+            initialValue = LogListModel()
         )
 
     fun clearLogs() {

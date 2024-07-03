@@ -2,7 +2,7 @@ package souldestroyer.wallet
 
 import souldestroyer.database.DatabaseModule
 import souldestroyer.database.dao.WalletDAO
-import souldestroyer.database.entity.WfWallet
+import souldestroyer.wallet.model.WfWallet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.DisposableHandle
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import souldestroyer.wallet.model.WalletListState
+import souldestroyer.wallet.model.WalletListModel
 import java.util.concurrent.CopyOnWriteArrayList
 
 class WalletRepository(
@@ -21,13 +21,13 @@ class WalletRepository(
 ) : DisposableHandle {
     private val walletIOScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    val walletListState = walletDAO.getAllInFlow()
+    val walletListModel = walletDAO.getAllInFlow()
         .distinctUntilChanged()
-        .map { WalletListState(it) }
+        .map { WalletListModel(it) }
         .stateIn(
             scope = walletIOScope,
             started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = WalletListState()
+            initialValue = WalletListModel()
         )
 
     private val _wallets = CopyOnWriteArrayList<WfWallet>()
@@ -36,7 +36,7 @@ class WalletRepository(
         @Volatile
         private var INSTANCE: WalletRepository? = null
 
-        fun get(): WalletRepository {
+        fun instance(): WalletRepository {
             return INSTANCE ?: synchronized(this) {
                 val instance = WalletRepository()
                 INSTANCE = instance
@@ -47,7 +47,7 @@ class WalletRepository(
 
     init {
         walletIOScope.launch {
-            walletListState.collect {
+            walletListModel.collect {
                 updateWalletsList(it.logList)
             }
         }

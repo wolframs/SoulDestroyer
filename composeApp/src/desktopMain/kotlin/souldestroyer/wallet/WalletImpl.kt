@@ -4,48 +4,40 @@ import souldestroyer.Constants
 import souldestroyer.sol.WfSolana
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableDoubleStateOf
-import foundation.metaplex.rpc.TransactionSignature
-import foundation.metaplex.solana.transactions.SerializedTransaction
-import foundation.metaplex.solana.transactions.Transaction
 import souldestroyer.database.dao.WalletDAO
-import souldestroyer.database.entity.WfWallet
+import souldestroyer.wallet.model.WfWallet
 import foundation.metaplex.solanapublickeys.PublicKey
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import org.bitcoinj.core.Base58
 import souldestroyer.SoulDestroyer
 import souldestroyer.logs.LogEntryType
 import souldestroyer.logs.LogRepository
 import souldestroyer.sol.HotSigner
-import souldestroyer.sol.Transactioneer
-import kotlin.system.measureTimeMillis
+import souldestroyer.wallet.domain.WalletManager
 
 class WalletImpl(
     val keypair: SolKeypair,
     val tag: String,
 ) {
+    private val walletScope = WalletManager.walletScope
     private val logRepo = LogRepository.instance()
 
-    private val walletRepository: WalletRepository = WalletRepository.get()
+    private val walletRepository: WalletRepository = WalletRepository.instance()
     private val walletDAO: WalletDAO = walletRepository.walletDAO
     private val wfSolana: WfSolana = SoulDestroyer.instance().solana
 
-    private val walletScope = CoroutineScope(Dispatchers.IO) + SupervisorJob()
     private var walletFlowJob: Job? = null
 
-    private var wfWallet: WfWallet
     var publicKey: PublicKey
 
     private var balance: MutableState<Double> = mutableDoubleStateOf(-99999.0)
 
-    private var signer: HotSigner
+    var signer: HotSigner
 
     companion object {
         fun fromDatabaseWfWallet(wfWallet: WfWallet): WalletImpl {
@@ -57,38 +49,22 @@ class WalletImpl(
 
     init {
         logRepo.log(
-            message = "Instatiating Wallet Implementation:\n" +
+            message = "Instantiating Wallet:\n" +
                     "PublicKey: ${keypair.publicKey}\n" +
                     "PrivateKey: ${if (keypair.secretKey.isNotEmpty()) "Exists." else "Empty!"}",
             type = LogEntryType.INFO
         )
-        wfWallet = WfWallet(
-            publicKey = keypair.publicKey.toString(),
-            privateKey = keypair.secretKey,
-            tag = tag
-        )
         publicKey = keypair.publicKey
-        insertToDatabaseIfNotExists(wfWallet) {
+        signer = HotSigner(keypair)
+
+        WalletManager.insertToDatabaseIfNotExists(keypair, tag) {
             startWalletFlow(keypair.publicKey.toString())
             retrieveBalance()
         }
-        Wallets.get().wList.add(this)
-        signer = HotSigner(keypair)
     }
 
     override fun toString(): String {
         return "WALLET \"$tag\" (${publicKey}): ${balance.value}"
-    }
-
-    private fun insertToDatabaseIfNotExists(wfWallet: WfWallet, onCompletion: () -> Unit) {
-        walletScope.launch(Dispatchers.IO) {
-            if (!walletRepository.doesWalletExistInDB(wfWallet.publicKey)) {
-                walletRepository.addWallet(wfWallet)
-                logRepo.logSuccess("Added $wfWallet to database.")
-            }
-        }.invokeOnCompletion {
-            onCompletion()
-        }
     }
 
     private fun startWalletFlow(
@@ -123,59 +99,13 @@ class WalletImpl(
         }
     }
 
-    fun sendMemoInitTransaction() {
-        val memo = "SoulDestroyer initialized Wallet $publicKey"
-
-        logRepo.log(
-            message = "Launching Memo Transaction.\nBuilding Tx...",
-            type = LogEntryType.INFO
-        )
-
-        walletScope.launch {
-            val totalTimeMs = measureTimeMillis {
-                val transactionSignature: TransactionSignature
-                val transaction: Transaction
-                val serializedTransaction: SerializedTransaction
-
-                val buildTimeMs = measureTimeMillis {
-                    transaction = Transactioneer.buildMemoTransaction(
-                        memo = memo,
-                        signer = signer
-                    )
-                }
-
-                val serializeTimeMs = measureTimeMillis {
-                    serializedTransaction = transaction.serialize()
-                }
-
-                logRepo.log(
-                    message = "Memo Tx was built ($buildTimeMs ms) and serialized ($serializeTimeMs ms).\n" +
-                            "Sending transaction, waiting for signature from RPC...",
-                    type = LogEntryType.INFO
-                )
-
-                val sendTimeMs = measureTimeMillis {
-                    transactionSignature = wfSolana.rpc.sendTransaction(serializedTransaction, null)
-                }
-
-                val signatureResponseString = transactionSignature.decodeToString()
-
-                logRepo.logSuccess(
-                    message = "(Tx total ms to signature: ${buildTimeMs + serializeTimeMs + sendTimeMs} ms)\n" +
-                            "Memo Tx signature received ($sendTimeMs ms):\n\n" +
-                            signatureResponseString
-                )
-            }
-        }
-    }
-
     fun remove() {
         walletScope.launch {
             // Cancel wallet flow
             walletFlowJob?.cancelAndJoin()
         }.invokeOnCompletion {
             // Clear from database and Wallets list
-            val walletsList = Wallets.get().wList
+            val walletsList = Wallets.instance().wList
             val wallet = walletsList.firstOrNull { it.tag == tag }
             if (wallet == null) {
                 logRepo.logError("Wallet with tag \"$tag\" not found.")
@@ -184,7 +114,7 @@ class WalletImpl(
             walletScope.launch {
                 var deleteFromDbSuccessful = false
                 try {
-                    walletRepository.walletDAO.delete(wfWallet)
+                    walletRepository.walletDAO.delete(publicKey.toString())
                     deleteFromDbSuccessful = true
                 } catch (e: Throwable) {
                     logRepo.logError("Could not remove WfWallet with tag $tag from Database. " + e.message)

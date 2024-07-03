@@ -47,7 +47,7 @@ fun CreateWalletScreen(
     var tag: String by remember { mutableStateOf("") }
     val clipboardManager = LocalClipboardManager.current
 
-    val walletRepository = WalletRepository.get()
+    val walletRepository = WalletRepository.instance()
 
     Column(
         modifier = Modifier
@@ -92,7 +92,7 @@ fun CreateWalletScreen(
 
         ActionButtons(
             onCreate = {
-                Wallets.get().createWallet(tag)
+                Wallets.instance().createNew(tag)
             },
             onCancel = onCancel
         )
