@@ -1,22 +1,32 @@
 package souldestroyer.sol
 
+import foundation.metaplex.rpc.Blockhash
 import foundation.metaplex.rpc.RPC
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.plus
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import souldestroyer.logs.LogRepository
 import souldestroyer.settings.SettingsManager
+import kotlin.system.measureTimeMillis
 
 class WfSolana(
     private val logRepository: LogRepository = LogRepository.instance()
 ) {
+    val wfSolanaScope = CoroutineScope(Dispatchers.Default) + SupervisorJob()
+
     var rpcEndpoint = SettingsManager().rpcEndpoint
     var rpc = RPC(rpcEndpoint.url)
+
+    lateinit var recentBlockhash: Blockhash
 
     companion object {
         @Volatile
         private var INSTANCE: WfSolana? = null
 
-        fun get(): WfSolana {
+        fun instance(): WfSolana {
             return INSTANCE ?: synchronized(this) {
                 val instance = WfSolana()
                 INSTANCE = instance
@@ -26,9 +36,23 @@ class WfSolana(
     }
 
     init {
+        val timeToBlockhash = runBlocking { // run this blocking, because we need the blockhash for subsequent operations
+            return@runBlocking updateRecentBlockhash()
+        }
         logRepository.logInfo(
-            message = "Active Solana RPC Endpoint is ${rpcEndpoint.description}."
+            message = "Active Solana RPC Endpoint is ${rpcEndpoint.description}.",
+            keys = listOf("Time to blockhash"),
+            values = listOf("$timeToBlockhash ms")
         )
+    }
+
+    /** Returns time to get latest blockhash in milliseconds. */
+    suspend fun updateRecentBlockhash(): Long {
+        return measureTimeMillis {
+            withContext(Dispatchers.IO) {
+                recentBlockhash = rpc.getLatestBlockhash(null).blockhash
+            }
+        }
     }
 
     suspend fun changeEndpoint(newRPCEndpoint: RPCEndpoint): Boolean {

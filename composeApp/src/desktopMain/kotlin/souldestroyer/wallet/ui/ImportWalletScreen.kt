@@ -124,22 +124,22 @@ private fun ActionButtons(
     ) {
         Spacer(Modifier.width(24.dp))
 
-        Button(
-            modifier = Modifier.weight(0.25f),
-            onClick = { onImport() }
-        ) {
-            Text("Recover Wallet")
-        }
-
-        Spacer(Modifier.width(24.dp))
-
-        Button(
+        OutlinedButton(
             modifier = Modifier.weight(0.25f),
             onClick = {
                 onCancel()
             }
         ) {
             Text("Cancel")
+        }
+
+        Spacer(Modifier.width(24.dp))
+
+        Button(
+            modifier = Modifier.weight(0.25f),
+            onClick = { onImport() }
+        ) {
+            Text("Recover Wallet")
         }
 
         Spacer(Modifier.width(24.dp))

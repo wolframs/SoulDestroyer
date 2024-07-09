@@ -1,5 +1,5 @@
 package souldestroyer
 
 object Constants {
-    const val LAMPERTS_PER_SOL: Double = 1000000000.0
+    const val LAMPERTS_PER_SOL: Int = 1000000000
 }

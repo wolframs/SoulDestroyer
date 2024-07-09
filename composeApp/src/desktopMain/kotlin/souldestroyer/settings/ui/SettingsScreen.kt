@@ -1,4 +1,4 @@
-package souldestroyer.settings
+package souldestroyer.settings.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import souldestroyer.SoulDestroyer
 import souldestroyer.navigation.Screen
+import souldestroyer.settings.RPCEndpointRadioList
 import souldestroyer.sol.RPCEndpoint
 
 @Serializable

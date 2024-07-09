@@ -4,6 +4,10 @@ import souldestroyer.Constants
 import souldestroyer.sol.WfSolana
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableDoubleStateOf
+import foundation.metaplex.amount.Amount
+import foundation.metaplex.amount.SolAmount
+import foundation.metaplex.amount.createAmount
+import foundation.metaplex.rpc.RpcRequestAirdropConfiguration
 import souldestroyer.database.dao.WalletDAO
 import souldestroyer.wallet.model.WfWallet
 import foundation.metaplex.solanapublickeys.PublicKey
@@ -93,7 +97,7 @@ class WalletImpl(
             try {
                 val balance =
                     wfSolana.rpc
-                        .getBalance(publicKey, null) / Constants.LAMPERTS_PER_SOL
+                        .getBalance(publicKey, null) / (Constants.LAMPERTS_PER_SOL).toDouble()
 
                 walletScope.launch(Dispatchers.IO) {
                     walletRepository.walletDAO.updateBalance(publicKey.toString(), balance)
@@ -101,8 +105,9 @@ class WalletImpl(
                     logRepo.logInfo("Updated balance of $tag: $balance")
                 }
             } catch (e: Throwable) {
-                // todo: add log, handle that stuff
-                throw e
+                logRepo.logError(
+                    message = "Could not retrieve balance for $tag:\n\n${e.message ?: "Unknown error."}"
+                )
             }
         }
     }
@@ -136,9 +141,5 @@ class WalletImpl(
                 }
             }
         }
-    }
-
-    fun requestAirdrop() {
-
     }
 }

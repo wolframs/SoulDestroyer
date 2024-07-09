@@ -10,8 +10,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import souldestroyer.settings.DebugScreen
-import souldestroyer.settings.SettingsScreen
+import souldestroyer.settings.ui.DebugScreen
+import souldestroyer.settings.ui.SettingsScreen
 import souldestroyer.main.MainScreen
 import souldestroyer.wallet.WalletRepository
 import souldestroyer.wallet.ui.CreateWalletScreen

@@ -50,8 +50,8 @@ class Wallets(
         }
     }
 
-    fun createNew(tag: String) {
-        WalletManager.newWallet(tag)
+    fun createNew(tag: String): Boolean {
+        return WalletManager.newWallet(tag)
     }
 
     fun createFromSecret(method: WalletImportSelectedMethod, tag: String, secretString: String) {

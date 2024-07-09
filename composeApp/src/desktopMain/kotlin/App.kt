@@ -7,22 +7,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.navigation.compose.rememberNavController
 import com.materialkolor.PaletteStyle
 import com.materialkolor.rememberDynamicMaterialThemeState
-import souldestroyer.settings.SettingsScreen
+import souldestroyer.settings.ui.SettingsScreen
 import souldestroyer.logs.ui.SideDisplaySection
 import souldestroyer.main.MainScreen
 import souldestroyer.navigation.BottomNavBar
 import souldestroyer.navigation.Screen
 import souldestroyer.navigation.WfNavHost
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import souldestroyer.SoulDestroyer
 import souldestroyer.settings.SettingsManager
 import theme.AppTheme
 import souldestroyer.wallet.ui.WalletScreen
@@ -30,7 +27,6 @@ import souldestroyer.wallet.ui.WalletScreen
 @Composable
 @Preview
 fun App() {
-    SoulDestroyer.instance()
 
     val SampleColors = listOf(
         Color(0xFFD32F2F),

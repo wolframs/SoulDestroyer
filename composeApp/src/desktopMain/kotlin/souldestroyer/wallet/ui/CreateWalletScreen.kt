@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
+import souldestroyer.logs.LogRepository
 import souldestroyer.navigation.Screen
 import souldestroyer.wallet.Wallets
 import souldestroyer.wallet.WalletRepository
@@ -92,7 +93,8 @@ fun CreateWalletScreen(
 
         ActionButtons(
             onCreate = {
-                Wallets.instance().createNew(tag)
+                if (Wallets.instance().createNew(tag))
+                    onCancel() // return to WalletScreen on success
             },
             onCancel = onCancel
         )
@@ -110,22 +112,22 @@ private fun ActionButtons(
     ) {
         Spacer(Modifier.width(24.dp))
 
-        Button(
-            modifier = Modifier.weight(0.25f),
-            onClick = { onCreate() }
-        ) {
-            Text("Do it")
-        }
-
-        Spacer(Modifier.width(24.dp))
-
-        Button(
+        OutlinedButton(
             modifier = Modifier.weight(0.25f),
             onClick = {
                 onCancel()
             }
         ) {
             Text("Cancel")
+        }
+
+        Spacer(Modifier.width(24.dp))
+
+        Button(
+            modifier = Modifier.weight(0.25f),
+            onClick = { onCreate() }
+        ) {
+            Text("Create Wallet")
         }
 
         Spacer(Modifier.width(24.dp))

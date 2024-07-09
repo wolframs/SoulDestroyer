@@ -15,10 +15,6 @@ class SolKeypair(override val publicKey: PublicKey, override val secretKey: Byte
         private val edDSA = SolanaEddsa
 
         fun fromPrivateKey(privateKeyString: String): SolKeypair {
-            logRepo.log(
-                message = "Calculating keypair from encoded secret key string...",
-                type = LogEntryType.INFO
-            )
             return runBlocking {
                 val secretAsByteArray = Base58.decode(privateKeyString)
                 val keypair = edDSA.createKeypairFromSecretKey(secretAsByteArray)
@@ -27,10 +23,6 @@ class SolKeypair(override val publicKey: PublicKey, override val secretKey: Byte
         }
 
         fun fromByteArray(secretKey: ByteArray): SolKeypair {
-            logRepo.log(
-                message = "Calculating keypair from encoded secret key string...",
-                type = LogEntryType.INFO
-            )
             return runBlocking {
                 val keypair = edDSA.createKeypairFromSecretKey(secretKey)
                 return@runBlocking SolKeypair(keypair.publicKey, keypair.secretKey)

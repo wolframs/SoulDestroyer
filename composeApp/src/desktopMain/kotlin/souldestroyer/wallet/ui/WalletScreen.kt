@@ -23,7 +23,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,8 +37,10 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import souldestroyer.wallet.model.WfWallet
 import kotlinx.serialization.Serializable
+import souldestroyer.logs.LogRepository
 import souldestroyer.wallet.Wallets
 import souldestroyer.wallet.domain.WalletManager
+import souldestroyer.wallet.domain.transaction.sendAirdropRequest
 import souldestroyer.wallet.domain.transaction.sendMemoTransaction
 
 @Serializable
@@ -48,15 +53,23 @@ object WalletScreen : Screen {
 
 @Composable
 fun WalletScreen(
-    paddingValues: PaddingValues? = null,
+    paddingValues: PaddingValues,
     wallets: List<WfWallet>,
     onGoToCreateWalletScreen: () -> Unit,
     onGoToImportWalletScreen: () -> Unit
 ) {
     Column(
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .padding(paddingValues)
+            .padding(24.dp)
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Wallets",
+            style = MaterialTheme.typography.headlineLarge
+        )
+
+        Spacer(Modifier.height(24.dp))
+
         wallets.forEach { wallet ->
 
             WalletRow(
@@ -83,7 +96,9 @@ fun GlobalWalletActions(
     onGoToImportWalletScreen: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(0.75f),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         Button(onClick = {
@@ -107,7 +122,8 @@ fun WalletRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth(0.75f)
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 shape = RoundedCornerShape(4.dp)
@@ -115,7 +131,7 @@ fun WalletRow(
     ) {
         Column(
             modifier = Modifier
-                .padding(all = 4.dp)
+                .padding(all = 12.dp)
         ) {
             val clipboardManager = LocalClipboardManager.current
             PublicKeyRow(publicKeyString, clipboardManager)
@@ -124,11 +140,18 @@ fun WalletRow(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
+            Spacer(Modifier.height(8.dp))
+
             Row {
                 RetrieveBalanceButton(publicKeyString)
-                Spacer(Modifier.width(16.dp))
+                Spacer(Modifier.width(12.dp))
+
                 MemoButton(publicKeyString)
+                Spacer(Modifier.width(12.dp))
+
+                RequestAirdropButton(publicKeyString)
                 Spacer(Modifier.width(32.dp))
+
                 RemoveButton(publicKeyString)
             }
 
@@ -188,9 +211,8 @@ private fun MemoButton(publicKeyString: String) {
     Button(
         onClick = {
             WalletManager.getByPublicKey(publicKeyString)?.let { wallet ->
-                sendMemoTransaction(
-                    memoText = "SoulDestroyer Wallet ${wallet.publicKey} says hi.",
-                    signer = wallet.signer
+                wallet.sendMemoTransaction(
+                    memoText = "SoulDestroyer Wallet ${wallet.publicKey} says hi."
                 )
             }
         }
@@ -204,10 +226,32 @@ private fun RetrieveBalanceButton(publicKeyString: String) {
     Button(
         onClick = {
             Wallets.instance().wList
-                .first { it.publicKey.toString() == publicKeyString }
-                .retrieveBalance()
+                .firstOrNull { it.publicKey.toString() == publicKeyString }
+                ?.retrieveBalance()
         }
     ) {
         Text("Update Balance")
+    }
+}
+
+@Composable
+private fun RequestAirdropButton(publicKeyString: String) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    AirdropRequestDialog(
+        showDialog = showDialog,
+        onDismissRequest = { showDialog = false },
+        onConfirmation = { amount ->
+            WalletManager.getByPublicKey(publicKeyString)?.sendAirdropRequest(
+                amount.toDoubleOrNull() ?: 0.0
+            )
+            showDialog = false
+        }
+    )
+
+    Button(
+        onClick = { showDialog = true }
+    ) {
+        Text("Airdrop")
     }
 }
