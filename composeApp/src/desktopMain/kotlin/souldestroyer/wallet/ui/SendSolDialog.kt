@@ -77,8 +77,8 @@ fun SendSolDialog(
 
                 Text(
                     text = "LOSS RISK WARNING:\n" +
-                            "Only supports basic Solana Network transfers.\n" +
-                            "Make sure that the receiver address is on the basic Solana network.\n" +
+                            "Only supports basic Solana Network transfers,\n" +
+                            "make sure that the receiver address is on the basic Solana network.\n" +
                             "\n" +
                             "Receiver address verification before sending may be faulty,\n" +
                             "your funds may get lost, if you don't double check the address yourself.",

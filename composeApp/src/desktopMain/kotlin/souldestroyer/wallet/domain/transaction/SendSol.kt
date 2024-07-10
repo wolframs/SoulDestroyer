@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import souldestroyer.Constants
 import souldestroyer.SoulDestroyer
 import souldestroyer.logs.LogRepository
+import souldestroyer.sol.Transactioneer
 import souldestroyer.sol.WfSolana
 import souldestroyer.wallet.WalletImpl
 import souldestroyer.wallet.domain.WalletManager.walletScope
@@ -28,20 +29,12 @@ fun WalletImpl.sendSolToReceiver(
 
             var transactionSignature: TransactionSignature? = null
 
-            val transferTransaction = SolanaTransactionBuilder()
-                .setRecentBlockHash(wfSolana.recentBlockhash)
-                .setSigners(
-                    listOf(signer)
-                )
-                .addInstruction(
-                        SystemProgram.transfer(
-                            fromPublicKey = publicKey,
-                            toPublickKey = recPublicKey,
-                            amount
-                        )
-                )
-                .build()
-
+            val transferTransaction = Transactioneer.buildTransferSolTransaction(
+                fromPublicKey = publicKey,
+                toPublicKey = recPublicKey,
+                amount = amount,
+                signer = signer
+            )
 
             val buildTimeMs = System.currentTimeMillis() - timeStart
 
@@ -70,11 +63,11 @@ fun WalletImpl.sendSolToReceiver(
 
             val signatureResponseString = transactionSignature?.decodeToString()
 
-            val totalTimeMs = System.currentTimeMillis() - sendTimeMs
+            val totalTimeMs = System.currentTimeMillis() - timeStart
 
             signatureResponseString?.let {
                 logRepo.logSuccess(
-                    message = "Memo transaction successful.",
+                    message = "Transferring $solAmount SOL to $receiverPublicKey from Wallet $tag was successful.",
                     keys = listOf("Signature", "Response time", "Tx time total"),
                     values = listOf(
                         signatureResponseString,
