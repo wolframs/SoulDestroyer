@@ -42,6 +42,7 @@ import souldestroyer.wallet.Wallets
 import souldestroyer.wallet.domain.WalletManager
 import souldestroyer.wallet.domain.transaction.sendAirdropRequest
 import souldestroyer.wallet.domain.transaction.sendMemoTransaction
+import souldestroyer.wallet.domain.transaction.sendSolToReceiver
 
 @Serializable
 object WalletScreen : Screen {
@@ -150,7 +151,12 @@ fun WalletRow(
                 Spacer(Modifier.width(12.dp))
 
                 RequestAirdropButton(publicKeyString)
+                Spacer(Modifier.width(12.dp))
+
+                SendSolButton(publicKeyString)
+
                 Spacer(Modifier.width(32.dp))
+
 
                 RemoveButton(publicKeyString)
             }
@@ -253,5 +259,28 @@ private fun RequestAirdropButton(publicKeyString: String) {
         onClick = { showDialog = true }
     ) {
         Text("Airdrop")
+    }
+}
+
+@Composable
+private fun SendSolButton(publicKeyString: String) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    SendSolDialog(
+        showDialog = showDialog,
+        onDismissRequest = { showDialog = false },
+        onConfirmation = { amount, receiverPublicKey ->
+            WalletManager.getByPublicKey(publicKeyString)?.sendSolToReceiver(
+                amount.toDoubleOrNull() ?: 0.0,
+                receiverPublicKey
+            )
+            showDialog = false
+        }
+    )
+
+    Button(
+        onClick = { showDialog = true }
+    ) {
+        Text("Transfer SOL")
     }
 }
