@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import souldestroyer.history.ui.TransactionScreen
 import souldestroyer.settings.ui.DebugScreen
 import souldestroyer.settings.ui.SettingsScreen
 import souldestroyer.main.MainScreen
@@ -32,9 +33,6 @@ fun WfNavHost(
         composable(route = MainScreen.route) {
             MainScreen(paddingValues = paddingValues)
         }
-        composable(route = SettingsScreen.route) {
-            DebugScreen(paddingValues = paddingValues)
-        }
         composable(route = WalletScreen.route) {
             val walletListState by WalletRepository.instance().walletListModel.collectAsState()
             WalletScreen(
@@ -47,6 +45,14 @@ fun WfNavHost(
                     navController.navigate(ImportWalletScreen.route)
                 }
             )
+        }
+        composable(route = TransactionScreen.route) {
+            TransactionScreen(
+                paddingValues = paddingValues
+            )
+        }
+        composable(route = SettingsScreen.route) {
+            DebugScreen(paddingValues = paddingValues)
         }
         composable(route = ImportWalletScreen.route) {
             ImportWalletScreen(

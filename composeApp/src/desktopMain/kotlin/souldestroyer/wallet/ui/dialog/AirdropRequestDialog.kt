@@ -1,4 +1,4 @@
-package souldestroyer.wallet.ui
+package souldestroyer.wallet.ui.dialog
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

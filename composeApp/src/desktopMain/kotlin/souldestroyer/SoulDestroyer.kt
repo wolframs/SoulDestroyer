@@ -18,7 +18,7 @@ class SoulDestroyer(
     val wallets: Wallets = Wallets.instance(), // needs to be instantiated asap
     val soulScope: CoroutineScope = CoroutineScope(Dispatchers.Default) + SupervisorJob()
 ) {
-    private val blockhashUpdateDelay = 5_000L
+    private val blockhashUpdateDelay = Constants.BLOCKHASH_REFRESH_DELAY
     private val logRepo = LogRepository.instance()
 
     var timeToBlockhashFlow = MutableStateFlow(0L)

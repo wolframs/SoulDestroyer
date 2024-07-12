@@ -1,7 +1,5 @@
 package souldestroyer.wallet.domain.transaction
 
-import foundation.metaplex.solana.programs.SystemProgram
-import foundation.metaplex.solana.transactions.SolanaTransactionBuilder
 import foundation.metaplex.solana.transactions.TransactionSignature
 import foundation.metaplex.solanapublickeys.PublicKey
 import kotlinx.coroutines.launch
@@ -10,6 +8,7 @@ import souldestroyer.SoulDestroyer
 import souldestroyer.logs.LogRepository
 import souldestroyer.sol.Transactioneer
 import souldestroyer.sol.WfSolana
+import souldestroyer.sol.domain.checkTransactionStatus
 import souldestroyer.wallet.WalletImpl
 import souldestroyer.wallet.domain.WalletManager.walletScope
 import kotlin.system.measureTimeMillis
@@ -75,6 +74,15 @@ fun WalletImpl.sendSolToReceiver(
                         "$totalTimeMs ms"
                     )
                 )
+
+                // Start confirm status polling on global scope
+                SoulDestroyer.instance().soulScope.launch {
+                    checkTransactionStatus(
+                        transactionSignatureBase58 = signatureResponseString,
+                        logRepo = logRepo,
+                        wfSolana = wfSolana
+                    )
+                }
             }
 
         } catch (e: Throwable) {

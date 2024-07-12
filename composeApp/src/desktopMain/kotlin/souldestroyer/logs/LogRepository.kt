@@ -1,8 +1,5 @@
 package souldestroyer.logs
 
-import souldestroyer.database.DatabaseModule
-import souldestroyer.database.dao.LogDAO
-import souldestroyer.logs.model.LogEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.DisposableHandle
@@ -10,22 +7,28 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
+import org.slf4j.LoggerFactory
+import souldestroyer.database.DatabaseModule
+import souldestroyer.database.dao.LogDAO
+import souldestroyer.logs.model.LogEntry
 import souldestroyer.logs.model.LogListModel
 
 class LogRepository(
     private val logDAO: LogDAO = DatabaseModule.getLogDAO()
 ) : DisposableHandle {
     private val logIOScope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    private val logger = LoggerFactory.getLogger("SoulDestroyer")
 
     companion object {
         @Volatile
@@ -49,6 +52,7 @@ class LogRepository(
         .loadLatestLog()
         .distinctUntilChanged()
         .map { LogListModel(it) }
+        .flowOn(Dispatchers.IO)
         .stateIn(
             scope = logIOScope,
             started = SharingStarted.WhileSubscribed(5_000L),
@@ -65,11 +69,16 @@ class LogRepository(
         }
     }
 
+    fun logDebug(message: String) {
+        logger.debug(message)
+    }
+
     fun logInfo(
         message: String,
         keys: List<String> = emptyList(),
         values: List<String> = emptyList()
     ) {
+        logger.info(getConsoleLogMsg(message, keys, values))
         log(message = message, type = LogEntryType.INFO, keys = keys, values = values)
     }
 
@@ -78,6 +87,7 @@ class LogRepository(
         keys: List<String> = emptyList(),
         values: List<String> = emptyList()
     ) {
+        logger.warn(getConsoleLogMsg(message, keys, values))
         log(message = message, type = LogEntryType.WARNING, keys = keys, values = values)
     }
 
@@ -86,6 +96,7 @@ class LogRepository(
         keys: List<String> = emptyList(),
         values: List<String> = emptyList()
     ) {
+        logger.error(getConsoleLogMsg(message, keys, values))
         log(message = message, type = LogEntryType.ERROR, keys = keys, values = values)
     }
 
@@ -94,6 +105,7 @@ class LogRepository(
         keys: List<String> = emptyList(),
         values: List<String> = emptyList()
     ) {
+        logger.info(getConsoleLogMsg(message, keys, values))
         log(message = message, type = LogEntryType.SUCCESS, keys = keys, values = values)
     }
 
@@ -123,5 +135,20 @@ class LogRepository(
                     LogEntry(message = message, type = type)
             )
         }
+    }
+
+    private fun getConsoleLogMsg(message: String, keys: List<String>, values: List<String>): String {
+        val stringBuilder = StringBuilder()
+
+        stringBuilder.appendLine(message)
+
+        if (keys.isNotEmpty()) {
+            stringBuilder.append("KEYS: ")
+            stringBuilder.appendLine(keys.joinToString("|"))
+            stringBuilder.append("VALUES: ")
+            stringBuilder.appendLine(values.joinToString("|"))
+        }
+
+        return stringBuilder.toString()
     }
 }

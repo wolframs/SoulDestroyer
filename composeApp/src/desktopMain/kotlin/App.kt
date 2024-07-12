@@ -20,6 +20,7 @@ import souldestroyer.navigation.BottomNavBar
 import souldestroyer.navigation.Screen
 import souldestroyer.navigation.WfNavHost
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import souldestroyer.navigation.mainScreens
 import souldestroyer.settings.SettingsManager
 import theme.AppTheme
 import souldestroyer.wallet.ui.WalletScreen
@@ -67,8 +68,6 @@ fun App() {
     AppTheme(
         state = themeState
     ) {
-        val mainScreens: List<Screen> = listOf(MainScreen, WalletScreen, SettingsScreen)
-
         //var showContent by remember { mutableStateOf(false) }
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 

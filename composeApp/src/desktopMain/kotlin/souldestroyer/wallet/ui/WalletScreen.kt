@@ -37,12 +37,18 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import souldestroyer.wallet.model.WfWallet
 import kotlinx.serialization.Serializable
-import souldestroyer.logs.LogRepository
 import souldestroyer.wallet.Wallets
 import souldestroyer.wallet.domain.WalletManager
 import souldestroyer.wallet.domain.transaction.sendAirdropRequest
 import souldestroyer.wallet.domain.transaction.sendMemoTransaction
 import souldestroyer.wallet.domain.transaction.sendSolToReceiver
+import souldestroyer.wallet.ui.button.MemoButton
+import souldestroyer.wallet.ui.button.RemoveButton
+import souldestroyer.wallet.ui.button.RequestAirdropButton
+import souldestroyer.wallet.ui.button.RetrieveBalanceButton
+import souldestroyer.wallet.ui.button.SendSolButton
+import souldestroyer.wallet.ui.dialog.AirdropRequestDialog
+import souldestroyer.wallet.ui.dialog.SendSolDialog
 
 @Serializable
 object WalletScreen : Screen {
@@ -157,7 +163,6 @@ fun WalletRow(
 
                 Spacer(Modifier.width(32.dp))
 
-
                 RemoveButton(publicKeyString)
             }
 
@@ -196,91 +201,5 @@ private fun PublicKeyRow(
                     }
                 )
         )
-    }
-}
-
-@Composable
-private fun RemoveButton(publicKeyString: String) {
-    OutlinedButton(
-        onClick = {
-            Wallets.instance().wList
-                .first { it.publicKey.toString() == publicKeyString }
-                .remove()
-        }
-    ) {
-        Text("Remove")
-    }
-}
-
-@Composable
-private fun MemoButton(publicKeyString: String) {
-    Button(
-        onClick = {
-            WalletManager.getByPublicKey(publicKeyString)?.let { wallet ->
-                wallet.sendMemoTransaction(
-                    memoText = "SoulDestroyer Wallet ${wallet.publicKey} says hi."
-                )
-            }
-        }
-    ) {
-        Text("Memo Tx")
-    }
-}
-
-@Composable
-private fun RetrieveBalanceButton(publicKeyString: String) {
-    Button(
-        onClick = {
-            Wallets.instance().wList
-                .firstOrNull { it.publicKey.toString() == publicKeyString }
-                ?.retrieveBalance()
-        }
-    ) {
-        Text("Update Balance")
-    }
-}
-
-@Composable
-private fun RequestAirdropButton(publicKeyString: String) {
-    var showDialog by remember { mutableStateOf(false) }
-
-    AirdropRequestDialog(
-        showDialog = showDialog,
-        onDismissRequest = { showDialog = false },
-        onConfirmation = { amount ->
-            WalletManager.getByPublicKey(publicKeyString)?.sendAirdropRequest(
-                amount.toDoubleOrNull() ?: 0.0
-            )
-            showDialog = false
-        }
-    )
-
-    Button(
-        onClick = { showDialog = true }
-    ) {
-        Text("Airdrop")
-    }
-}
-
-@Composable
-private fun SendSolButton(publicKeyString: String) {
-    var showDialog by remember { mutableStateOf(false) }
-
-    SendSolDialog(
-        showDialog = showDialog,
-        onDismissRequest = { showDialog = false },
-        onConfirmation = { amount, receiverPublicKey ->
-            WalletManager.getByPublicKey(publicKeyString)?.sendSolToReceiver(
-                amount.toDoubleOrNull() ?: 0.0,
-                receiverPublicKey
-            )
-            showDialog = false
-        }
-    )
-
-    Button(
-        onClick = { showDialog = true }
-    ) {
-        Text("Transfer SOL")
     }
 }

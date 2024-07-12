@@ -36,12 +36,12 @@ class WfSolana(
     }
 
     init {
-        val timeToBlockhash = runBlocking { // run this blocking, because we need the blockhash for subsequent operations
+        val timeToBlockhash = runBlocking { // run this blocking, because we need the blockhash for operations as soon as the app has started
             return@runBlocking updateRecentBlockhash()
         }
         logRepository.logInfo(
             message = "Active Solana RPC Endpoint is ${rpcEndpoint.description}.",
-            keys = listOf("Time to blockhash"),
+            keys = listOf("1st blockhash init"),
             values = listOf("$timeToBlockhash ms")
         )
     }
