@@ -22,6 +22,7 @@ import souldestroyer.database.DatabaseModule
 import souldestroyer.database.dao.LogDAO
 import souldestroyer.logs.model.LogEntry
 import souldestroyer.logs.model.LogListModel
+import souldestroyer.settings.SettingsManager
 
 class LogRepository(
     private val logDAO: LogDAO = DatabaseModule.getLogDAO()
@@ -69,8 +70,31 @@ class LogRepository(
         }
     }
 
-    fun logDebug(message: String) {
+    fun logDebug(
+        message: String,
+        keys: List<String> = emptyList(),
+        values: List<String> = emptyList()
+    ) {
         logger.debug(message)
+        log(message = message, type = LogEntryType.DEBUG, keys = keys, values = values)
+    }
+
+    fun logTransactInfo(
+        message: String,
+        keys: List<String> = emptyList(),
+        values: List<String> = emptyList()
+    ) {
+        logger.info(getConsoleLogMsg("TRANSACT_INFO: $message", keys, values))
+        log(message = message, type = LogEntryType.TRANSACT_INFO, keys = keys, values = values)
+    }
+
+    fun logTransactSuccess(
+        message: String,
+        keys: List<String> = emptyList(),
+        values: List<String> = emptyList()
+    ) {
+        logger.info(getConsoleLogMsg("TRANSACT_SUCCESS: $message", keys, values))
+        log(message = message, type = LogEntryType.TRANSACT_SUCCESS, keys = keys, values = values)
     }
 
     fun logInfo(
@@ -119,13 +143,7 @@ class LogRepository(
             val keysCount = keys.count()
             val valuesCount = values.count()
             if (keysCount != valuesCount) {
-                logDAO.insert(
-                    LogEntry(
-                        message = "Could not insert log entry '$message', because count of keys (${keys.count()}) did " +
-                                "not match count of values (${values.count()}).",
-                        type = LogEntryType.WARNING
-                    )
-                )
+                keyCountDoesNotMatchValueCount(message, keys, values)
                 return@launch
             }
             logDAO.insert(
@@ -135,6 +153,20 @@ class LogRepository(
                     LogEntry(message = message, type = type)
             )
         }
+    }
+
+    private suspend fun keyCountDoesNotMatchValueCount(
+        message: String,
+        keys: List<String>,
+        values: List<String>
+    ) {
+        logDAO.insert(
+            LogEntry(
+                message = "Could not insert log entry '$message', because count of keys (${keys.count()}) did " +
+                        "not match count of values (${values.count()}).",
+                type = LogEntryType.WARNING
+            )
+        )
     }
 
     private fun getConsoleLogMsg(message: String, keys: List<String>, values: List<String>): String {

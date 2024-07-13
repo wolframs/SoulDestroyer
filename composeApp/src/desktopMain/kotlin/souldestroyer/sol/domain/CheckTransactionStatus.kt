@@ -2,11 +2,15 @@ package souldestroyer.sol.domain
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import souldestroyer.Constants
 import souldestroyer.logs.LogRepository
 import souldestroyer.sol.WfSolana
 import souldestroyer.sol.model.ConfirmationStatus
+import souldestroyer.sol.model.SignatureStatus
+import souldestroyer.wallet.Wallets
+import souldestroyer.wallet.domain.WalletManager
 
 suspend fun checkTransactionStatus(
     transactionSignatureBase58: String,
@@ -17,16 +21,29 @@ suspend fun checkTransactionStatus(
         var confirmed = false
         var pollingTimeCounter = 0
         val id = transactionSignatureBase58.take(6)
+        var status: SignatureStatus? = null
+        var attemptNo = 0
+
+        delay(350) // makes no sense to start polling before transaction had a chance to be processed
+
+        logRepo.logInfo(
+            message = "Starting to follow up on status of Tx signature $id... until it is finalized. " +
+                    "(Enable verbose log entries to see individual check request.)"
+        )
 
         while (!confirmed) {
-            delay(Constants.CONFIRM_POLLING_DELAY)
+            // Our delay starts at CONFIRM_POLLING_DELAY, then increase by 50ms for each iteration
+            delay(Constants.CONFIRM_POLLING_DELAY + (attemptNo * 50L))
+            attemptNo++
 
             pollingTimeCounter += Constants.CONFIRM_POLLING_DELAY.toInt()
-            if (pollingTimeCounter >= Constants.CONFIRM_MAX_POLLING_TIME)
+            if (pollingTimeCounter >= Constants.CONFIRM_MAX_POLLING_TIME) {
+                timeoutReachedWarning(logRepo, id, status)
                 return@withContext
+            }
 
             try {
-                val status = wfSolana.getSignatureStatuses(
+                status = wfSolana.getSignatureStatuses(
                     signature = transactionSignatureBase58,
                     id = id
                 )
@@ -36,11 +53,16 @@ suspend fun checkTransactionStatus(
                     logRepo.logSuccess(
                         message = "Transaction $id... is finalized."
                     )
+                    // Refresh wallet balances
+                    Wallets.instance().wList.forEach { wallet ->
+                        delay(300)
+                        wallet.retrieveBalance()
+                    }
+
                 } else {
-                    logRepo.logInfo(
-                        message = "Checking status of Tx signature $id...",
-                        keys = listOf("Current Status"),
-                        values = listOf(status?.confirmationStatus ?: "Unknown (may be dropped or RPC calls exceeded)")
+                    logRepo.logDebug(
+                        message = "Current status of Tx signature $id is " +
+                                "${status?.confirmationStatus ?: "Unknown (may be dropped or RPC calls exceeded)"}..."
                     )
                 }
             } catch (e: Throwable) {
@@ -50,4 +72,22 @@ suspend fun checkTransactionStatus(
             }
         }
     }
+}
+
+private fun timeoutReachedWarning(
+    logRepo: LogRepository,
+    id: String,
+    status: SignatureStatus?
+) {
+    logRepo.logWarning(
+        message = "Timeout reached for checking status of transaction $id...\n" +
+                "The status never reached the finalized stage. " +
+                "The transaction may have been dropped or RPC calls were exceeded during checking.",
+        keys = listOf("Last known status", "Timeout limit", "Signature"),
+        values = listOf(
+            status?.confirmationStatus ?: "Unknown",
+            "${Constants.CONFIRM_MAX_POLLING_TIME} ms",
+            id
+        )
+    )
 }

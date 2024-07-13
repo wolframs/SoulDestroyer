@@ -11,6 +11,7 @@ import souldestroyer.sol.WfSolana
 import souldestroyer.sol.domain.checkTransactionStatus
 import souldestroyer.wallet.WalletImpl
 import souldestroyer.wallet.domain.WalletManager.walletScope
+import kotlin.math.log
 import kotlin.system.measureTimeMillis
 
 
@@ -20,6 +21,10 @@ fun WalletImpl.sendSolToReceiver(
     logRepo: LogRepository = LogRepository.instance(),
     wfSolana: WfSolana = SoulDestroyer.instance().solana
 ) {
+    logRepo.logDebug(
+        message = "Launching transfer of $solAmount SOL to $receiverPublicKey from Wallet $tag."
+    )
+
     walletScope.launch {
         try {
             val timeStart = System.currentTimeMillis()
@@ -41,7 +46,7 @@ fun WalletImpl.sendSolToReceiver(
 
             val serializeTimeMs = System.currentTimeMillis() - buildTimeMs - timeStart
 
-            logRepo.logInfo(
+            logRepo.logTransactInfo(
                 message = "Sending $solAmount SOL to $receiverPublicKey from Wallet $tag.\n" +
                         "Tx built, serialized. Sending and waiting for signature...",
                 keys = listOf("Built in", "Serialized in"),
@@ -65,7 +70,7 @@ fun WalletImpl.sendSolToReceiver(
             val totalTimeMs = System.currentTimeMillis() - timeStart
 
             signatureResponseString?.let {
-                logRepo.logSuccess(
+                logRepo.logTransactSuccess(
                     message = "Transferring $solAmount SOL to $receiverPublicKey from Wallet $tag was successful.",
                     keys = listOf("Signature", "Response time", "Tx time total"),
                     values = listOf(

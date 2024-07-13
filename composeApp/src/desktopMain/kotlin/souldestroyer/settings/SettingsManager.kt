@@ -14,6 +14,7 @@ class SettingsManager {
         private const val KEY_THEME_COLOR = "theme_color"
         private const val KEY_THEME_PALETTE = "theme_palette"
         private const val KEY_THEME_DARK = "theme_dark"
+        private const val KEY_LOGS_SHOW_VERBOSE = "logs_show_verbose"
     }
 
     var rpcEndpoint: RPCEndpoint
@@ -38,6 +39,12 @@ class SettingsManager {
         get() = preferences.getBoolean(KEY_THEME_DARK, false)
         set(value) {
             preferences.putBoolean(KEY_THEME_DARK, value)
+        }
+
+    var showVerboseLogs: Boolean
+        get() = preferences.getBoolean(KEY_LOGS_SHOW_VERBOSE, false)
+        set(value) {
+            preferences.putBoolean(KEY_LOGS_SHOW_VERBOSE, value)
         }
 
     fun clearSettings() {

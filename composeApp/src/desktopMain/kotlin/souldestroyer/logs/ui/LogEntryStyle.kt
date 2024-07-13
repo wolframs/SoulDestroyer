@@ -58,13 +58,4 @@ object LogEntryStyle {
         else ->
             MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.75f)
     }
-
-    fun getLogIconAccordingToType(logEntryType: LogEntryType): ImageVector {
-        return when (logEntryType) {
-            LogEntryType.INFO -> Icons.Default.Info
-            LogEntryType.WARNING -> Icons.Default.Warning
-            LogEntryType.ERROR -> Icons.Default.Close
-            LogEntryType.SUCCESS -> Icons.Default.ThumbUp
-        }
-    }
 }

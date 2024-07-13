@@ -11,6 +11,7 @@ import souldestroyer.logs.LogRepository
 import souldestroyer.sol.HotSigner
 import souldestroyer.sol.Transactioneer
 import souldestroyer.sol.WfSolana
+import souldestroyer.sol.domain.checkTransactionStatus
 import souldestroyer.wallet.WalletImpl
 import souldestroyer.wallet.domain.WalletManager.walletScope
 import kotlin.system.measureTimeMillis
@@ -20,7 +21,7 @@ fun WalletImpl.sendMemoTransaction(
     logRepo: LogRepository = LogRepository.instance(),
     wfSolana: WfSolana = SoulDestroyer.instance().solana,
 ) {
-    logRepo.logInfo(
+    logRepo.logDebug(
         message = "Launching Memo Transaction.\nBuilding Tx...",
     )
 
@@ -40,9 +41,8 @@ fun WalletImpl.sendMemoTransaction(
             serializedTransaction = transaction.serialize()
         }
 
-        logRepo.logInfo(
-            message = "Memo Tx was built ($buildTimeMs ms) and serialized ($serializeTimeMs ms).\n" +
-                    "Sending transaction, waiting for signature from RPC...",
+        logRepo.logTransactInfo(
+            message = "Sending Memo Tx, waiting for signature from RPC...",
             keys = listOf("Built in", "Serialized in"),
             values = listOf(
                 "$buildTimeMs ms",
@@ -55,7 +55,7 @@ fun WalletImpl.sendMemoTransaction(
                 transactionSignature = wfSolana.rpc.sendTransaction(serializedTransaction, null)
             } catch (transactionException: Throwable) {
                 logRepo.logError(
-                    message = "Transaction error:\n\n" +
+                    message = "Memo transaction error:\n\n" +
                             (transactionException.message
                                 ?: "Unknown exception (RPC.sendTransaction() did not return error data).")
                 )
@@ -65,7 +65,7 @@ fun WalletImpl.sendMemoTransaction(
         val signatureResponseString = transactionSignature?.decodeToString()
 
         signatureResponseString?.let {
-            logRepo.logSuccess(
+            logRepo.logTransactSuccess(
                 message = "Memo transaction successful.",
                 keys = listOf("Signature", "Response time", "Tx time total"),
                 values = listOf(
@@ -74,6 +74,15 @@ fun WalletImpl.sendMemoTransaction(
                     "${buildTimeMs + serializeTimeMs + sendTimeMs} ms"
                 )
             )
+
+            // Start confirm status polling on global scope
+            SoulDestroyer.instance().soulScope.launch {
+                checkTransactionStatus(
+                    transactionSignatureBase58 = signatureResponseString,
+                    logRepo = logRepo,
+                    wfSolana = wfSolana
+                )
+            }
         }
     }
 }

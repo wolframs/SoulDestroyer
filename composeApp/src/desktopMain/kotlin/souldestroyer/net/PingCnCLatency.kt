@@ -5,7 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class Requester (
+class PingCnCLatency (
 ) {
     private val networkScope = CoroutineScope(Dispatchers.IO)
     private val httpClient = HttpClient()
