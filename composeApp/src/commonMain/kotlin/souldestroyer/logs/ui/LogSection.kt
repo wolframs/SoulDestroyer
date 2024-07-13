@@ -10,22 +10,28 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.unit.dp
+import souldestroyer.logs.LogEntryType
 import souldestroyer.logs.model.LogEntry
+import souldestroyer.settings.SettingsManager
 import souldestroyer.simpleVerticalScrollbar
 
 @Composable
 fun LogSection(
     lazyListState: LazyListState = rememberLazyListState(),
+    settingsManager: SettingsManager = SettingsManager(),
     backgroundColor: Color,
     logList: List<LogEntry>,
     modifier: Modifier
 ) {
     val clipboardManager = LocalClipboardManager.current
+    val showVerboseLogs by settingsManager.showVerboseLogsFlow.collectAsState(initial = true)
+
     LazyColumn(
         state = lazyListState,
         modifier = modifier
@@ -39,7 +45,9 @@ fun LogSection(
             Spacer(Modifier.height(4.dp))
         }
         items(
-            logList.take(100)
+            logList.take(100).filter { logEntry ->
+                showVerboseLogs || logEntry.type != LogEntryType.DEBUG
+            }
         ) { logEntry ->
             LogEntryRow(
                 dateTime = logEntry.dateTime,

@@ -29,12 +29,13 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import souldestroyer.navigation.Screen
+import souldestroyer.shared.ui.ScrollableScreenColumnWithHeadline
 import souldestroyer.wallet.Wallets
 import souldestroyer.wallet.domain.WalletImportSelectedMethod
 
 @Serializable
 object ImportWalletScreen : Screen {
-    override val label: String = "Recover Wallet"
+    override val label: String = "Import Wallet"
     override val route: String = "/wallet/importWallet"
     override val iconImageVector: ImageVector = Icons.Filled.AddCircle
     override var selected = mutableStateOf(false)
@@ -51,16 +52,10 @@ fun ImportWalletScreen(
     var privateKeyString by remember { mutableStateOf("") }
     var tagString by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .padding(paddingValues)
-            .padding(24.dp)
+    ScrollableScreenColumnWithHeadline(
+        paddingValues = paddingValues,
+        headline = "Import Wallet"
     ) {
-        Text(
-            text = "Recover Wallet",
-            style = MaterialTheme.typography.headlineLarge
-        )
-        Spacer(Modifier.height(24.dp))
 
         ImportMethodRadioList(selectedMethod) {
             selectedMethod = it

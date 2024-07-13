@@ -1,7 +1,6 @@
 package souldestroyer.wallet.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -27,10 +25,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
-import souldestroyer.logs.LogRepository
 import souldestroyer.navigation.Screen
-import souldestroyer.wallet.Wallets
+import souldestroyer.shared.ui.ScrollableScreenColumnWithHeadline
 import souldestroyer.wallet.WalletRepository
+import souldestroyer.wallet.Wallets
 
 @Serializable
 object CreateWalletScreen : Screen {
@@ -50,17 +48,10 @@ fun CreateWalletScreen(
 
     val walletRepository = WalletRepository.instance()
 
-    Column(
-        modifier = Modifier
-            .padding(paddingValues)
-            .padding(24.dp)
+    ScrollableScreenColumnWithHeadline(
+        paddingValues = paddingValues,
+        headline = "Create Wallet"
     ) {
-        Text(
-            text = "Create Wallet",
-            style = MaterialTheme.typography.headlineLarge
-        )
-
-        Spacer(Modifier.height(24.dp))
 
         Row(
             modifier = Modifier
@@ -87,9 +78,7 @@ fun CreateWalletScreen(
             }
         }
 
-        Spacer(Modifier.height(24.dp))
-
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(48.dp))
 
         ActionButtons(
             onCreate = {

@@ -1,6 +1,5 @@
 package souldestroyer.wallet.ui
 
-import souldestroyer.navigation.Screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,13 +19,9 @@ import androidx.compose.material.icons.outlined.CopyAll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,20 +30,15 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import souldestroyer.wallet.model.WfWallet
 import kotlinx.serialization.Serializable
-import souldestroyer.wallet.Wallets
-import souldestroyer.wallet.domain.WalletManager
-import souldestroyer.wallet.domain.transaction.sendAirdropRequest
-import souldestroyer.wallet.domain.transaction.sendMemoTransaction
-import souldestroyer.wallet.domain.transaction.sendSolToReceiver
+import souldestroyer.navigation.Screen
+import souldestroyer.shared.ui.ScrollableScreenColumnWithHeadline
+import souldestroyer.wallet.model.WfWallet
 import souldestroyer.wallet.ui.button.MemoButton
 import souldestroyer.wallet.ui.button.RemoveButton
 import souldestroyer.wallet.ui.button.RequestAirdropButton
 import souldestroyer.wallet.ui.button.RetrieveBalanceButton
 import souldestroyer.wallet.ui.button.SendSolButton
-import souldestroyer.wallet.ui.dialog.AirdropRequestDialog
-import souldestroyer.wallet.ui.dialog.SendSolDialog
 
 @Serializable
 object WalletScreen : Screen {
@@ -65,18 +55,10 @@ fun WalletScreen(
     onGoToCreateWalletScreen: () -> Unit,
     onGoToImportWalletScreen: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .padding(paddingValues)
-            .padding(24.dp)
+    ScrollableScreenColumnWithHeadline(
+        paddingValues = paddingValues,
+        headline = "Wallets"
     ) {
-        Text(
-            text = "Wallets",
-            style = MaterialTheme.typography.headlineLarge
-        )
-
-        Spacer(Modifier.height(24.dp))
-
         wallets.forEach { wallet ->
 
             WalletRow(
@@ -116,7 +98,7 @@ fun GlobalWalletActions(
         Button(onClick = {
             onGoToImportWalletScreen()
         }) {
-            Text("Recover Wallet")
+            Text("Import Wallet")
         }
     }
 }

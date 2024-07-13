@@ -11,7 +11,6 @@ import souldestroyer.sol.WfSolana
 import souldestroyer.sol.domain.checkTransactionStatus
 import souldestroyer.wallet.WalletImpl
 import souldestroyer.wallet.domain.WalletManager.walletScope
-import kotlin.math.log
 import kotlin.system.measureTimeMillis
 
 
@@ -71,7 +70,8 @@ fun WalletImpl.sendSolToReceiver(
 
             signatureResponseString?.let {
                 logRepo.logTransactSuccess(
-                    message = "Transferring $solAmount SOL to $receiverPublicKey from Wallet $tag was successful.",
+                    message = "Transaction to transfer $solAmount SOL to $receiverPublicKey from Wallet $tag was successful.\n" +
+                            "Waiting for signature status to finalize...",
                     keys = listOf("Signature", "Response time", "Tx time total"),
                     values = listOf(
                         signatureResponseString,

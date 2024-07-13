@@ -1,6 +1,8 @@
 package souldestroyer.settings
 
 import com.materialkolor.PaletteStyle
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import souldestroyer.sol.RPCEndpoint
 import java.util.prefs.Preferences
 
@@ -41,10 +43,14 @@ class SettingsManager {
             preferences.putBoolean(KEY_THEME_DARK, value)
         }
 
+    private val _showVerboseLogsFlow = MutableStateFlow(showVerboseLogs)
+    val showVerboseLogsFlow: Flow<Boolean> get() = _showVerboseLogsFlow
+
     var showVerboseLogs: Boolean
         get() = preferences.getBoolean(KEY_LOGS_SHOW_VERBOSE, false)
         set(value) {
             preferences.putBoolean(KEY_LOGS_SHOW_VERBOSE, value)
+            _showVerboseLogsFlow.value = value
         }
 
     fun clearSettings() {

@@ -2,7 +2,6 @@ package souldestroyer.sol.domain
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import souldestroyer.Constants
 import souldestroyer.logs.LogRepository
@@ -10,7 +9,6 @@ import souldestroyer.sol.WfSolana
 import souldestroyer.sol.model.ConfirmationStatus
 import souldestroyer.sol.model.SignatureStatus
 import souldestroyer.wallet.Wallets
-import souldestroyer.wallet.domain.WalletManager
 
 suspend fun checkTransactionStatus(
     transactionSignatureBase58: String,
@@ -18,25 +16,39 @@ suspend fun checkTransactionStatus(
     wfSolana: WfSolana
 ) {
     withContext(Dispatchers.IO) {
+        val startTime = System.currentTimeMillis()
         var confirmed = false
-        var pollingTimeCounter = 0
+        var pollingTimeCounter = 0L
         val id = transactionSignatureBase58.take(6)
         var status: SignatureStatus? = null
-        var attemptNo = 0
 
         delay(350) // makes no sense to start polling before transaction had a chance to be processed
 
         logRepo.logInfo(
             message = "Starting to follow up on status of Tx signature $id... until it is finalized. " +
-                    "(Enable verbose log entries to see individual check request.)"
+                    "(Enable verbose log entries to see individual check requests.)"
         )
 
+        var attemptNo = 0
+
+        val baseDelay = 750L
+        val maxDecreaseAttempts = 12
+        val increaseAfterMaxDecreaseAttempts = 120L
+
         while (!confirmed) {
-            // Our delay starts at CONFIRM_POLLING_DELAY, then increase by 50ms for each iteration
-            delay(Constants.CONFIRM_POLLING_DELAY + (attemptNo * 50L))
+            val iterationDelay = if (attemptNo < maxDecreaseAttempts) {
+                // Decrease delay from 2x baseDelay (1500) to baseDelay over maxDecreaseAttempts iterations
+                // This will lead to the shortest delay of 750ms after 13.5 seconds
+                (2 * baseDelay) - ((baseDelay / maxDecreaseAttempts) * attemptNo)
+            } else {
+                // After X attempts, increase delay for each attempt until exit due to CONFIRM_MAX_POLLING_TIME
+                baseDelay + ((attemptNo - maxDecreaseAttempts) * increaseAfterMaxDecreaseAttempts)
+            }
+
+            delay(iterationDelay)
             attemptNo++
 
-            pollingTimeCounter += Constants.CONFIRM_POLLING_DELAY.toInt()
+            pollingTimeCounter += iterationDelay
             if (pollingTimeCounter >= Constants.CONFIRM_MAX_POLLING_TIME) {
                 timeoutReachedWarning(logRepo, id, status)
                 return@withContext
@@ -50,8 +62,11 @@ suspend fun checkTransactionStatus(
 
                 if (status != null && status.confirmationStatus == ConfirmationStatus.FINALIZED.description) {
                     confirmed = true
+                    val duration = System.currentTimeMillis() - startTime
                     logRepo.logSuccess(
-                        message = "Transaction $id... is finalized."
+                        message = "Transaction $id... is finalized.",
+                        keys = listOf("Duration", "Signature"),
+                        values = listOf("$duration ms", transactionSignatureBase58)
                     )
                     // Refresh wallet balances
                     Wallets.instance().wList.forEach { wallet ->

@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import souldestroyer.navigation.Screen
+import souldestroyer.shared.ui.ScrollableScreenColumnWithHeadline
 
 @Serializable
 object TransactionScreen: Screen {
@@ -29,17 +30,10 @@ object TransactionScreen: Screen {
 fun TransactionScreen(
     paddingValues: PaddingValues
 ) {
-    Column(
-        modifier = Modifier
-            .padding(paddingValues)
-            .padding(24.dp)
+    ScrollableScreenColumnWithHeadline(
+        paddingValues = paddingValues,
+        headline = "Transactions"
     ) {
-        Text(
-            text = "Transactions",
-            style = MaterialTheme.typography.headlineLarge
-        )
-
-        Spacer(Modifier.height(24.dp))
 
         PendingTransactions()
 

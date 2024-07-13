@@ -1,6 +1,5 @@
 package souldestroyer.main
 
-import souldestroyer.navigation.Screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,6 +25,8 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
+import souldestroyer.navigation.Screen
+import souldestroyer.shared.ui.ScrollableScreenColumnWithHeadline
 
 @Serializable
 object MainScreen: Screen {
@@ -36,9 +37,10 @@ object MainScreen: Screen {
 }
 
 @Composable
-fun MainScreen(paddingValues: PaddingValues? = null) {
-    Column(
-        modifier = Modifier.padding(8.dp)
+fun MainScreen(paddingValues: PaddingValues) {
+    ScrollableScreenColumnWithHeadline(
+        paddingValues = paddingValues,
+        headline = "Home"
     ) {
         InputField()
     }

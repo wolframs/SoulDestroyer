@@ -22,7 +22,6 @@ import souldestroyer.database.DatabaseModule
 import souldestroyer.database.dao.LogDAO
 import souldestroyer.logs.model.LogEntry
 import souldestroyer.logs.model.LogListModel
-import souldestroyer.settings.SettingsManager
 
 class LogRepository(
     private val logDAO: LogDAO = DatabaseModule.getLogDAO()
@@ -143,7 +142,7 @@ class LogRepository(
             val keysCount = keys.count()
             val valuesCount = values.count()
             if (keysCount != valuesCount) {
-                keyCountDoesNotMatchValueCount(message, keys, values)
+                logKeyCountDoesNotMatchValueCount(message, keys, values)
                 return@launch
             }
             logDAO.insert(
@@ -155,7 +154,7 @@ class LogRepository(
         }
     }
 
-    private suspend fun keyCountDoesNotMatchValueCount(
+    private suspend fun logKeyCountDoesNotMatchValueCount(
         message: String,
         keys: List<String>,
         values: List<String>

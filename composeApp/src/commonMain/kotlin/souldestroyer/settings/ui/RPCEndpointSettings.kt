@@ -1,4 +1,4 @@
-package souldestroyer.settings
+package souldestroyer.settings.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,21 +10,27 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
+import souldestroyer.SoulDestroyer
 import souldestroyer.shared.ui.TextWithHyperlinkParenthesis
 import souldestroyer.sol.RPCEndpoint
 
 @Composable
-fun RPCEndpointRadioList(
-    options: List<RPCEndpoint>,
-    selectedOption: RPCEndpoint,
-    enabled: Boolean,
-    onSelectOption: (RPCEndpoint) -> Unit
-) {
+fun RPCEndpointSettings() {
+    val availableRpcEndpoints = RPCEndpoint.entries
+    var selectedRPCEndpoint by remember {
+        mutableStateOf(SoulDestroyer.instance().solana.rpcEndpoint)
+    }
+    var rpcEndpointRadioListEnabled by remember { mutableStateOf(true) }
     Column(
         modifier = Modifier.padding(start = 32.dp, top = 16.dp)
     ) {
@@ -46,14 +52,39 @@ fun RPCEndpointRadioList(
 
         Spacer(Modifier.height(4.dp))
 
-        options.forEach { rpcEndpoint ->
-            RPCEndpointRadioButtonRow(
-                rpcEndpoint,
-                selectedOption,
-                enabled
-            ) {
-                onSelectOption(rpcEndpoint)
+        RPCEndpointRadioList(
+            options = availableRpcEndpoints,
+            selectedOption = selectedRPCEndpoint,
+            enabled = rpcEndpointRadioListEnabled
+        ) { newSelectedRpcEndpoint ->
+            rpcEndpointRadioListEnabled = false
+            SoulDestroyer.instance().soulScope.launch {
+                if (
+                    SoulDestroyer.instance().solana.changeEndpoint(newSelectedRpcEndpoint)
+                ) {
+                    selectedRPCEndpoint = newSelectedRpcEndpoint
+                }
+            }.invokeOnCompletion {
+                rpcEndpointRadioListEnabled = true
             }
+        }
+    }
+}
+
+@Composable
+private fun RPCEndpointRadioList(
+    options: List<RPCEndpoint>,
+    selectedOption: RPCEndpoint,
+    enabled: Boolean,
+    onSelectOption: (RPCEndpoint) -> Unit
+) {
+    options.forEach { rpcEndpoint ->
+        RPCEndpointRadioButtonRow(
+            rpcEndpoint,
+            selectedOption,
+            enabled
+        ) {
+            onSelectOption(rpcEndpoint)
         }
     }
 }
@@ -74,11 +105,11 @@ private fun RPCEndpointRadioButtonRow(
             enabled = enabled
         )
         Spacer(modifier = Modifier.width(2.dp))
-            TextWithHyperlinkParenthesis(
-                modifier = Modifier.padding(bottom = 3.dp),
-                text = thisRpcEndpoint.description,
-                url = thisRpcEndpoint.url,
-                style = TextStyle.Default.copy(fontSize = 16.sp)
-            )
+        TextWithHyperlinkParenthesis(
+            text = thisRpcEndpoint.description,
+            url = thisRpcEndpoint.url,
+            style = TextStyle.Default.copy(fontSize = 16.sp),
+            modifier = Modifier.padding(bottom = 3.dp)
+        )
     }
 }
