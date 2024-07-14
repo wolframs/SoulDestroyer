@@ -39,8 +39,7 @@ fun LogSectionSettingsUI(
 
         Text(
             text = "Control whether to show verbose debug logs in the live log list.\n" +
-                    "This includes such logs as information about each sub request of ongoing processes like getting " +
-                    "a signature status.",
+                    "This includes logs of small database interactions or ongoing polling operations.",
             style = MaterialTheme.typography.bodySmall
         )
 

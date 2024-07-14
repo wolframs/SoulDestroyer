@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format
-import souldestroyer.logs.LogEntryType
+import souldestroyer.logs.model.LogEntryType
 import souldestroyer.logs.ui.LogEntryStyle.getLogEntryRowBackgroundColor
 import souldestroyer.logs.ui.LogEntryStyle.getLogEntryRowColor
 import souldestroyer.logs.wfDateTimeFormat

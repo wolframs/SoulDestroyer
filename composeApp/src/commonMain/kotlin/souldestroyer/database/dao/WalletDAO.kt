@@ -1,12 +1,12 @@
 package souldestroyer.database.dao
 
-import souldestroyer.wallet.model.WfWallet
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import souldestroyer.wallet.model.WfWallet
 
 @Dao
 interface WalletDAO {
@@ -30,6 +30,9 @@ interface WalletDAO {
 
     @Query("UPDATE wfwallet SET balance = :balance WHERE publicKey = :publicKeyString")
     suspend fun updateBalance(publicKeyString: String, balance: Double)
+
+    @Query("UPDATE wfwallet SET isActiveAccount = :newIsActiveAccountValue WHERE publicKey = :pubicKeyString")
+    suspend fun setIsActiveAccount(pubicKeyString: String, newIsActiveAccountValue: Boolean)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg wfWallets: WfWallet)

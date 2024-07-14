@@ -5,8 +5,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import souldestroyer.logs.LogEntryType
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import souldestroyer.logs.LogRepository
+import souldestroyer.logs.model.LogEntryType
 import souldestroyer.wallet.SolKeypair
 import souldestroyer.wallet.WalletImpl
 import souldestroyer.wallet.WalletRepository
@@ -15,6 +17,7 @@ import souldestroyer.wallet.model.WfWallet
 
 object WalletManager {
     val walletScope = CoroutineScope(Dispatchers.IO) + SupervisorJob()
+    val mutex = Mutex()
 
     private val walletRepo = WalletRepository.instance()
     private val logRepo = LogRepository.instance()
@@ -126,6 +129,22 @@ object WalletManager {
             }
         }.invokeOnCompletion {
             onCompletion()
+        }
+    }
+
+    fun ensureAtLeastOneAccountIsActive() {
+        walletScope.launch {
+            mutex.withLock {
+                val allWalletsInDatabase = walletRepo.walletDAO.getAll()
+                if (allWalletsInDatabase.isEmpty()) {
+                    return@launch
+                }
+                if (allWalletsInDatabase.none { it.isActiveAccount }) {
+                    allWalletsInDatabase.first().let { firstWallet ->
+                        walletRepo.setIsActiveAccount(firstWallet.publicKey, true)
+                    }
+                }
+            }
         }
     }
 }

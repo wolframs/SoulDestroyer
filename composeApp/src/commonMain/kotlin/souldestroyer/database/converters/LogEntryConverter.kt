@@ -1,7 +1,7 @@
 package souldestroyer.database.converters
 
 import androidx.room.TypeConverter
-import souldestroyer.logs.LogEntryType
+import souldestroyer.logs.model.LogEntryType
 
 class LogEntryConverter {
     @TypeConverter

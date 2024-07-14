@@ -1,9 +1,5 @@
 package souldestroyer.database.converters
 
-import androidx.room.TypeConverter
-import foundation.metaplex.solana.transactions.TransactionSignature
-import souldestroyer.logs.LogEntryType
-
 /*
 class TransactionSignatureConverter {
     @TypeConverter

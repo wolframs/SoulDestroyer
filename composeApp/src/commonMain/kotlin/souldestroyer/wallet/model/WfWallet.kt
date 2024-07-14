@@ -8,5 +8,6 @@ data class WfWallet(
     @PrimaryKey val publicKey: String,
     var privateKey: ByteArray,
     var tag: String,
-    var balance: Double = 0.0
+    var balance: Double = 0.0,
+    var isActiveAccount: Boolean = false
 )

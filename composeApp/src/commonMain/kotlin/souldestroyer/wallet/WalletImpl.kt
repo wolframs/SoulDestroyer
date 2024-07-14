@@ -2,6 +2,7 @@ package souldestroyer.wallet
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateOf
 import foundation.metaplex.solanapublickeys.PublicKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,11 +33,13 @@ class WalletImpl(
 
     private var walletFlowJob: Job? = null
 
-    var publicKey: PublicKey
+    var publicKey: PublicKey = keypair.publicKey
+    var signer: HotSigner = HotSigner(keypair)
 
+    // << Updated by Flow >>
+    var isActiveAccount: MutableState<Boolean> = mutableStateOf(false)
     private var balance: MutableState<Double> = mutableDoubleStateOf(-99999.0)
 
-    var signer: HotSigner
 
     companion object {
         fun fromDatabaseWfWallet(wfWallet: WfWallet): WalletImpl {
@@ -47,9 +50,6 @@ class WalletImpl(
     }
 
     init {
-        publicKey = keypair.publicKey
-        signer = HotSigner(keypair)
-
         try {
             WalletManager.insertToDatabaseIfNotExists(keypair, tag) {
                 startWalletFlow(keypair.publicKey.toString())
@@ -67,6 +67,8 @@ class WalletImpl(
                 keys = listOf("Tag", "Public Key", "Error"),
                 values = listOf(tag, keypair.publicKey.toString(), e.message ?: "Unknown error.")
             )
+        } finally {
+            WalletManager.ensureAtLeastOneAccountIsActive()
         }
     }
 
@@ -83,6 +85,7 @@ class WalletImpl(
                 .flowOn(Dispatchers.IO)
                 .collect {
                     balance.value = it.balance
+                    isActiveAccount.value = it.isActiveAccount
                 }
         }
     }
@@ -135,6 +138,12 @@ class WalletImpl(
                     }
                 }
             }
+        }
+    }
+
+    fun setIsActiveAccount(newIsActiveAccountValue: Boolean) {
+        walletScope.launch {
+            walletRepository.setIsActiveAccount(publicKey.toString(), newIsActiveAccountValue)
         }
     }
 }

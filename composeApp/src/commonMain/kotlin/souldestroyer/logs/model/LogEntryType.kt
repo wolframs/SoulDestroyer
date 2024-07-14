@@ -1,4 +1,4 @@
-package souldestroyer.logs
+package souldestroyer.logs.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ForwardToInbox

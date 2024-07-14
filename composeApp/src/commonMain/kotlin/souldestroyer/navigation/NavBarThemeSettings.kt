@@ -18,10 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.materialkolor.PaletteStyle
-import souldestroyer.settings.SeedColors
 import souldestroyer.settings.ThemeState
 
 @Composable
@@ -40,7 +37,7 @@ fun NavBarThemeSettings(
         ) {
             IconButton(
                 onClick = {
-                    globalThemeState.changeThemeIsDark(globalThemeState.state)
+                    globalThemeState.changeThemeIsDark()
                 },
                 modifier = Modifier.size(46.dp)
             ) {
@@ -67,8 +64,7 @@ fun NavBarThemeSettings(
 
 @Composable
 private fun ColorSelector(
-    globalThemeState: ThemeState,
-    seedColors: List<Color> = SeedColors
+    globalThemeState: ThemeState
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -76,7 +72,7 @@ private fun ColorSelector(
         ArrowIconButton(
             direction = ArrowIconButtonDirection.LEFT,
             onClick = {
-                globalThemeState.changeThemeSeedColorFromNavBar(seedColors, ArrowIconButtonDirection.LEFT)
+                globalThemeState.changeThemeSeedColorFromNavBar(ArrowIconButtonDirection.LEFT)
             }
         )
 
@@ -94,7 +90,7 @@ private fun ColorSelector(
         ArrowIconButton(
             direction = ArrowIconButtonDirection.RIGHT,
             onClick = {
-                globalThemeState.changeThemeSeedColorFromNavBar(seedColors, ArrowIconButtonDirection.RIGHT)
+                globalThemeState.changeThemeSeedColorFromNavBar(ArrowIconButtonDirection.RIGHT)
             }
         )
     }
@@ -104,14 +100,13 @@ private fun ColorSelector(
 private fun PaletteSelector(
     globalThemeState: ThemeState
 ) {
-    val styleEntries = PaletteStyle.entries
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
         ArrowIconButton(
             direction = ArrowIconButtonDirection.LEFT,
             onClick = {
-                globalThemeState.changeThemePaletteFromNavBar(styleEntries, ArrowIconButtonDirection.LEFT)
+                globalThemeState.changeThemePaletteFromNavBar(ArrowIconButtonDirection.LEFT)
             }
         )
 
@@ -129,7 +124,7 @@ private fun PaletteSelector(
         ArrowIconButton(
             direction = ArrowIconButtonDirection.RIGHT,
             onClick = {
-                globalThemeState.changeThemePaletteFromNavBar(styleEntries, ArrowIconButtonDirection.RIGHT)
+                globalThemeState.changeThemePaletteFromNavBar(ArrowIconButtonDirection.RIGHT)
             }
         )
     }

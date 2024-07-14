@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.unit.dp
-import souldestroyer.logs.LogEntryType
+import souldestroyer.logs.model.LogEntryType
 import souldestroyer.logs.model.LogEntry
 import souldestroyer.settings.SettingsManager
 import souldestroyer.shared.ui.simpleVerticalScrollbar

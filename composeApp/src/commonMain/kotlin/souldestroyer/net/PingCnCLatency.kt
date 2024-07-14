@@ -43,7 +43,7 @@ class PingCnCLatency (
             } catch (e: Throwable) {
                 logface.log(
                     message = "PING Failure: ${e.message}",
-                    type = souldestroyer.logs.LogEntryType.ERROR
+                    type = souldestroyer.logs.model.LogEntryType.ERROR
                 )
             }*/
         }

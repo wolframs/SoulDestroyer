@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import com.materialkolor.PaletteStyle
 import souldestroyer.settings.SeedColors
 import souldestroyer.settings.SettingsManager
+import souldestroyer.settings.ThemeState
 import souldestroyer.settings.ui.elements.SettingRowTextField
 
 @Composable
@@ -34,7 +35,7 @@ fun ThemeSettingsUI(
         modifier = Modifier.padding(start = 32.dp, top = 16.dp)
     ) {
         Text(
-            text = "RPC Endpoint",
+            text = "Theme Settings",
             style = MaterialTheme.typography.headlineSmall
         )
 
@@ -50,6 +51,7 @@ fun ThemeSettingsUI(
 
         DarkLightModeSetting(isDark = isDark) { newValue ->
             settingsManager.darkTheme = newValue
+            ThemeState.instance().changeThemeIsDark(newValue)
         }
 
         Spacer(Modifier.height(4.dp))
@@ -57,7 +59,7 @@ fun ThemeSettingsUI(
         ThemeColorSetting(
             activeColorId
         ) { newValue ->
-            settingsManager.themeColor = newValue
+            ThemeState.instance().changeThemeSeedColorByListIndex(newValue)
         }
 
         Spacer(Modifier.height(4.dp))
@@ -65,7 +67,7 @@ fun ThemeSettingsUI(
         ThemePaletteSetting(
             activePaletteId
         ) { newValue ->
-            settingsManager.themePalette = newValue
+            ThemeState.instance().changeThemePaletteByListIndex(newValue)
         }
     }
 }
@@ -98,17 +100,18 @@ private fun ThemeColorSetting(
     activeColorId: Int,
     onIdChange: (Int) -> Unit
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
+    SettingRowTextField(
+        primaryText = "(0 - ${SeedColors.size - 1})",
+        textFieldValue = activeColorId.toString(),
+        textFieldLabelText = "Color #"
     ) {
-        SettingRowTextField(
-            primaryText = "Color (0 - ${SeedColors.size - 1})",
-            textFieldValue = activeColorId.toString(),
-            textFieldLabelText = "ID #"
+        if (it.isBlank()) {
+            onIdChange(0)
+        }
+        if (it.toIntOrNull() != null
+            && it.toInt() in SeedColors.indices
         ) {
-            if (it.isNotEmpty() && it.toIntOrNull() != null) {
-                onIdChange(it.toInt())
-            }
+            onIdChange(it.toInt())
         }
     }
 }
@@ -119,12 +122,17 @@ private fun ThemePaletteSetting(
     onIdChange: (Int) -> Unit
 ) {
     SettingRowTextField(
-        primaryText = "Palette (0 - ${PaletteStyle.entries.size - 1})",
+        primaryText = "(0 - ${PaletteStyle.entries.size - 1})",
         secondaryText = PaletteStyle.entries[activePaletteId].name,
         textFieldValue = activePaletteId.toString(),
-        textFieldLabelText = "ID #"
+        textFieldLabelText = "Palette Style #"
     ) {
-        if (it.isNotEmpty() && it.toIntOrNull() != null && it.toInt() in 0..8) {
+        if (it.isBlank()) {
+            onIdChange(0)
+        }
+        if (it.toIntOrNull() != null
+            && it.toInt() in PaletteStyle.entries.indices
+        ) {
             onIdChange(it.toInt())
         }
     }

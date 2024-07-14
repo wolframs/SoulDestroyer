@@ -4,7 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.materialkolor.ktx.blend
-import souldestroyer.logs.LogEntryType
+import souldestroyer.logs.model.LogEntryType
 
 object LogEntryStyle {
     @Composable

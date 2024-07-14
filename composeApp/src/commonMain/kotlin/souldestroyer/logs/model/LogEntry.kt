@@ -3,7 +3,6 @@ package souldestroyer.logs.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.datetime.LocalDateTime
-import souldestroyer.logs.LogEntryType
 import souldestroyer.logs.getLocalDateTimeNow
 import java.util.UUID
 

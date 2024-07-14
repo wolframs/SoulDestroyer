@@ -49,7 +49,8 @@ fun MainScreen(paddingValues: PaddingValues) {
         ScrollableScreenColumnWithHeadline(
             modifier = Modifier.fillMaxHeight(),
             paddingValues = paddingValues,
-            headline = "Home"
+            headline = "Soul Destroyer",
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             //InputField()
             Column(
@@ -71,7 +72,7 @@ fun MainScreen(paddingValues: PaddingValues) {
                         val paddingVertical =
                             paddingValues.calculateTopPadding().toPx() + paddingValues.calculateBottomPadding().toPx()
                         imageHeight =
-                            (screenHeight - (paddingVertical + 320.dp.toPx())).toInt() // 120 -> remove the height of the headline and outer column paddings, leave space for text below
+                            (screenHeight - (paddingVertical + 220.dp.toPx())).toInt() // 120 -> remove the height of the headline and outer column paddings, leave space for text below
                     }
                 }
 
@@ -83,7 +84,7 @@ fun MainScreen(paddingValues: PaddingValues) {
                     "Throwing away all of your money to finally get that lucky trade and make it back in a single instant is the best strategy!",
                     "Not touching your savings is for losers - the people around you will agree!",
                     "If you don't have much income, you can always take out a loan to trade with!",
-                    "Common Solana Trading Bots are only called bots, because they're telegram bots. They have no programmatic intelligence of their own.",
+                    "Common Solana Trading Bots are only called bots, because they're telegram bots. They have no intelligence of their own.",
                     "The name of this application was inspired by the Soul Ripper from the Supreme Commander game series and a popular telegram bot.",
                     "The Soul Destroyer application is designed to allow you to trade away your soul to the gods of the chain with maximum technical transparency.",
                     "If this application had been tested half as well as there was effort put into these texts, it would be safe to use.",

@@ -9,12 +9,15 @@ import androidx.compose.ui.draw.clip
 import org.jetbrains.compose.resources.imageResource
 import souldestroyer.composeapp.generated.resources.Res
 import souldestroyer.composeapp.generated.resources.souldestroyer_wallpaper_1
+import souldestroyer.composeapp.generated.resources.souldestroyer_wallpaper_10
 import souldestroyer.composeapp.generated.resources.souldestroyer_wallpaper_2
 import souldestroyer.composeapp.generated.resources.souldestroyer_wallpaper_3
 import souldestroyer.composeapp.generated.resources.souldestroyer_wallpaper_4
 import souldestroyer.composeapp.generated.resources.souldestroyer_wallpaper_5
 import souldestroyer.composeapp.generated.resources.souldestroyer_wallpaper_6
 import souldestroyer.composeapp.generated.resources.souldestroyer_wallpaper_7
+import souldestroyer.composeapp.generated.resources.souldestroyer_wallpaper_8
+import souldestroyer.composeapp.generated.resources.souldestroyer_wallpaper_9
 
 @Composable
 fun SoulDestroyerWallpaperImage(
@@ -28,7 +31,10 @@ fun SoulDestroyerWallpaperImage(
         Res.drawable.souldestroyer_wallpaper_4,
         Res.drawable.souldestroyer_wallpaper_5,
         Res.drawable.souldestroyer_wallpaper_6,
-        Res.drawable.souldestroyer_wallpaper_7
+        Res.drawable.souldestroyer_wallpaper_7,
+        Res.drawable.souldestroyer_wallpaper_8,
+        Res.drawable.souldestroyer_wallpaper_9,
+        Res.drawable.souldestroyer_wallpaper_10
     )
 
     // Select a random wallpaper ID

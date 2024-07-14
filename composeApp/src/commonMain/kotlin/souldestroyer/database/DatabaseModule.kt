@@ -2,9 +2,9 @@ package souldestroyer.database
 
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import kotlinx.coroutines.Dispatchers
 import souldestroyer.database.dao.LogDAO
 import souldestroyer.database.dao.WalletDAO
-import kotlinx.coroutines.Dispatchers
 import java.io.File
 
 object DatabaseModule {
@@ -18,9 +18,11 @@ object DatabaseModule {
             val instance = Room.databaseBuilder<WfDatabase>(
                 name = dbFile.absolutePath
             )
-                .fallbackToDestructiveMigration(false)
                 .setDriver(BundledSQLiteDriver())
                 .setQueryCoroutineContext(Dispatchers.IO)
+                .addMigrations(
+                    souldestroyer.database.migration.MIGRATION_6_7
+                )
                 .build()
             INSTANCE = instance
             instance

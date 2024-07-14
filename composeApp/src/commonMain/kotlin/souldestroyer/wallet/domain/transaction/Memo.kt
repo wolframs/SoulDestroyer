@@ -8,7 +8,7 @@ import souldestroyer.SoulDestroyer
 import souldestroyer.logs.LogRepository
 import souldestroyer.sol.Transactioneer
 import souldestroyer.sol.WfSolana
-import souldestroyer.sol.domain.checkTransactionStatus
+import souldestroyer.sol.status.checkTransactionStatus
 import souldestroyer.wallet.WalletImpl
 import souldestroyer.wallet.domain.WalletManager.walletScope
 import kotlin.system.measureTimeMillis

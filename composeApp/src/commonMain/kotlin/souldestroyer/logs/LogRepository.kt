@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory
 import souldestroyer.database.DatabaseModule
 import souldestroyer.database.dao.LogDAO
 import souldestroyer.logs.model.LogEntry
+import souldestroyer.logs.model.LogEntryType
 import souldestroyer.logs.model.LogListModel
 
 class LogRepository(

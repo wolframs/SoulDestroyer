@@ -5,7 +5,7 @@ import foundation.metaplex.solanaeddsa.SolanaEddsa
 import foundation.metaplex.solanapublickeys.PublicKey
 import kotlinx.coroutines.runBlocking
 import org.bitcoinj.core.Base58
-import souldestroyer.logs.LogEntryType
+import souldestroyer.logs.model.LogEntryType
 import souldestroyer.logs.LogRepository
 
 class SolKeypair(override val publicKey: PublicKey, override val secretKey: ByteArray) : Keypair {

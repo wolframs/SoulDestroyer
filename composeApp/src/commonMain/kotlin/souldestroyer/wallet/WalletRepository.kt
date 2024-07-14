@@ -1,8 +1,5 @@
 package souldestroyer.wallet
 
-import souldestroyer.database.DatabaseModule
-import souldestroyer.database.dao.WalletDAO
-import souldestroyer.wallet.model.WfWallet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.DisposableHandle
@@ -13,7 +10,11 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import souldestroyer.database.DatabaseModule
+import souldestroyer.database.dao.WalletDAO
+import souldestroyer.logs.LogRepository
 import souldestroyer.wallet.model.WalletListModel
+import souldestroyer.wallet.model.WfWallet
 import java.util.concurrent.CopyOnWriteArrayList
 
 class WalletRepository(
@@ -59,7 +60,7 @@ class WalletRepository(
     }
 
     fun addWallet(wfWallet: WfWallet) {
-        walletIOScope.launch(Dispatchers.IO) {
+        walletIOScope.launch {
             walletDAO.insert(wfWallet)
         }
     }
@@ -70,5 +71,25 @@ class WalletRepository(
 
     suspend fun doesWalletExistInDB(publicKeyString: String): Boolean {
         return walletDAO.doesWalletExist(publicKeyString)
+    }
+
+    fun setIsActiveAccount(pubicKeyString: String, newIsActiveAccountValue: Boolean) {
+        walletIOScope.launch {
+
+            walletDAO.getAll().forEach {
+                walletDAO.setIsActiveAccount(it.publicKey, false)
+            }
+            walletDAO.setIsActiveAccount(pubicKeyString, newIsActiveAccountValue)
+
+            val allWalletsInDatabase = walletDAO.getAll()
+            if (allWalletsInDatabase.isNotEmpty()) {
+                LogRepository.instance().logDebug(
+                    message = "Updated active account to $pubicKeyString.",
+                    keys = allWalletsInDatabase.map { it.tag },
+                    values = allWalletsInDatabase.map { if (it.isActiveAccount) "Active" else "Inactive" }
+                )
+            }
+
+        }
     }
 }

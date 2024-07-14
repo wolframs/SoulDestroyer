@@ -34,11 +34,14 @@ fun DebugScreen(paddingValues: PaddingValues) {
 
         RPCEndpointSettingsUI()
 
+        Spacer(Modifier.height(16.dp))
+
         LogSectionSettingsUI(settingsManager)
+
+        Spacer(Modifier.height(16.dp))
 
         ThemeSettingsUI(settingsManager)
 
-        Spacer(Modifier.height(24.dp))
     }
 }
 

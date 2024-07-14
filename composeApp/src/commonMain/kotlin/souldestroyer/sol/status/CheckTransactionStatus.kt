@@ -1,4 +1,4 @@
-package souldestroyer.sol.domain
+package souldestroyer.sol.status
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

@@ -1,4 +1,4 @@
-package souldestroyer.sol.domain
+package souldestroyer.sol.status
 
 import com.funkatronics.rpccore.Rpc20Response
 import io.ktor.client.HttpClient

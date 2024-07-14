@@ -1,6 +1,5 @@
 package souldestroyer.settings
 
-import androidx.compose.ui.graphics.Color
 import com.materialkolor.DynamicMaterialThemeState
 import com.materialkolor.PaletteStyle
 import souldestroyer.navigation.ArrowIconButtonDirection
@@ -25,37 +24,38 @@ class ThemeState private constructor() {
             _state = value
         }
 
-    fun changeThemeIsDark(state: DynamicMaterialThemeState) {
-        state.isDark = !state.isDark
+    fun changeThemeIsDark(newValue: Boolean? = null) {
+        state.isDark = newValue ?: !state.isDark
         SettingsManager().darkTheme = state.isDark
     }
 
-    fun changeThemeSeedColorFromNavBar(
-        seedColors: List<Color>,
-        direction: ArrowIconButtonDirection
-    ) {
-        var indexOfSeedColor = seedColors.indexOf(state.seedColor)
+    fun changeThemeSeedColorFromNavBar(direction: ArrowIconButtonDirection) {
+        var indexOfSeedColor = SeedColors.indexOf(state.seedColor)
 
         when (direction) {
             ArrowIconButtonDirection.LEFT -> {
-                state.seedColor = seedColors.getOrNull(seedColors.indexOf(state.seedColor) - 1)
-                    ?: seedColors[seedColors.size - 1]
+                state.seedColor = SeedColors.getOrNull(SeedColors.indexOf(state.seedColor) - 1)
+                    ?: SeedColors[SeedColors.size - 1]
             }
 
             ArrowIconButtonDirection.RIGHT -> {
-                state.seedColor = seedColors.getOrNull(indexOfSeedColor + 1)
-                    ?: seedColors[0]
+                state.seedColor = SeedColors.getOrNull(indexOfSeedColor + 1)
+                    ?: SeedColors[0]
             }
         }
 
-        indexOfSeedColor = seedColors.indexOf(state.seedColor)
+        indexOfSeedColor = SeedColors.indexOf(state.seedColor)
         SettingsManager().themeColor = indexOfSeedColor
     }
 
-    fun changeThemePaletteFromNavBar(
-        styleEntries: EnumEntries<PaletteStyle>,
-        direction: ArrowIconButtonDirection
-    ) {
+    fun changeThemeSeedColorByListIndex(colorIndex: Int) {
+        state.seedColor = SeedColors.getOrNull(colorIndex)
+            ?: SeedColors[0]
+        SettingsManager().themeColor = SeedColors.indexOf(state.seedColor)
+    }
+
+    fun changeThemePaletteFromNavBar(direction: ArrowIconButtonDirection) {
+        val styleEntries: EnumEntries<PaletteStyle> = PaletteStyle.entries
         var indexOfPaletteEntry = styleEntries.indexOf(state.style)
 
         when (direction) {
@@ -72,5 +72,11 @@ class ThemeState private constructor() {
 
         indexOfPaletteEntry = styleEntries.indexOf(state.style)
         SettingsManager().themePalette = indexOfPaletteEntry
+    }
+
+    fun changeThemePaletteByListIndex(paletteIndex: Int) {
+        state.style = PaletteStyle.entries.getOrNull(paletteIndex)
+            ?: PaletteStyle.entries[0]
+        SettingsManager().themePalette = PaletteStyle.entries.indexOf(state.style)
     }
 }
