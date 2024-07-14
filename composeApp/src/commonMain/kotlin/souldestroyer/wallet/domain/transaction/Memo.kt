@@ -3,12 +3,9 @@ package souldestroyer.wallet.domain.transaction
 import foundation.metaplex.solana.transactions.SerializedTransaction
 import foundation.metaplex.solana.transactions.Transaction
 import foundation.metaplex.solana.transactions.TransactionSignature
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import souldestroyer.SoulDestroyer
-import souldestroyer.logs.LogEntryType
 import souldestroyer.logs.LogRepository
-import souldestroyer.sol.HotSigner
 import souldestroyer.sol.Transactioneer
 import souldestroyer.sol.WfSolana
 import souldestroyer.sol.domain.checkTransactionStatus

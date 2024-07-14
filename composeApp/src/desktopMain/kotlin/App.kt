@@ -1,3 +1,4 @@
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,64 +10,41 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import com.materialkolor.PaletteStyle
 import com.materialkolor.rememberDynamicMaterialThemeState
-import souldestroyer.settings.ui.SettingsScreen
-import souldestroyer.logs.ui.SideDisplaySection
-import souldestroyer.main.MainScreen
-import souldestroyer.navigation.BottomNavBar
-import souldestroyer.navigation.Screen
-import souldestroyer.navigation.WfNavHost
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import souldestroyer.logs.ui.SideDisplaySection
+import souldestroyer.navigation.BottomNavBar
+import souldestroyer.navigation.WfNavHost
 import souldestroyer.navigation.mainScreens
+import souldestroyer.settings.SeedColors
 import souldestroyer.settings.SettingsManager
+import souldestroyer.settings.ThemeState
 import theme.AppTheme
-import souldestroyer.wallet.ui.WalletScreen
 
 @Composable
 @Preview
 fun App() {
 
-    val SampleColors = listOf(
-        Color(0xFFD32F2F),
-        Color(0xFFC2185B),
-        Color(0xFF7B1FA2),
-        Color(0xFF512DA8),
-        Color(0xFF303F9F),
-        Color(0xFF1976D2),
-        Color(0xFF0288D1),
-        Color(0xFF0097A7),
-        Color(0xFF00796B),
-        Color(0xFF388E3C),
-        Color(0xFF689F38),
-        Color(0xFFAFB42B),
-        Color(0xFFFBC02D),
-        Color(0xFFFFA000),
-        Color(0xFFF57C00),
-        Color(0xFFE64A19),
-        Color(0xFF5D4037),
-        Color(0xFF616161),
-        Color(0xFF455A64),
-        Color(0xFF263238),
-    )
-
     val isDarkTheme = SettingsManager().darkTheme
     val seedColor by rememberSaveable {
-        mutableStateOf(SampleColors[SettingsManager().themeColor ?: 7])
+        mutableStateOf(SeedColors[SettingsManager().themeColor])
     }
     val style by rememberSaveable {
         mutableStateOf(PaletteStyle.entries[SettingsManager().themePalette])
     }
-    val themeState = rememberDynamicMaterialThemeState(
+
+    val globalThemeState = ThemeState.instance()
+
+    globalThemeState.state = rememberDynamicMaterialThemeState(
         seedColor = seedColor,
         isDark = isDarkTheme,
-        style = style,
+        style = style
     )
 
     AppTheme(
-        state = themeState
+        state = globalThemeState.state
     ) {
         //var showContent by remember { mutableStateOf(false) }
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -78,8 +56,7 @@ fun App() {
                 bottomBar = {
                     Row() {
                         BottomNavBar(
-                            themeState = themeState,
-                            sampleColors = SampleColors,
+                            globalThemeState = globalThemeState,
                             navController = navController,
                             mainScreens = mainScreens,
                             modifier = Modifier.fillMaxWidth()

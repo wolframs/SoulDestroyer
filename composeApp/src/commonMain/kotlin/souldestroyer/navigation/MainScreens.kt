@@ -1,8 +1,8 @@
 package souldestroyer.navigation
 
 import souldestroyer.history.ui.TransactionScreen
-import souldestroyer.main.MainScreen
+import souldestroyer.home.ui.HomeScreen
 import souldestroyer.settings.ui.SettingsScreen
 import souldestroyer.wallet.ui.WalletScreen
 
-val mainScreens: List<Screen> = listOf(MainScreen, WalletScreen, TransactionScreen, SettingsScreen)
+val mainScreens: List<Screen> = listOf(HomeScreen, WalletScreen, TransactionScreen, SettingsScreen)

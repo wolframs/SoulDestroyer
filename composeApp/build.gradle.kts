@@ -69,7 +69,6 @@ kotlin {
             implementation("org.apache.logging.log4j:log4j-core:3.0.0-beta2")
             // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
             implementation("org.apache.logging.log4j:log4j-slf4j-impl:3.0.0-beta2")
-
         }
         /*jvmMain.dependencies {
             implementation(libs.koin.core)
@@ -86,7 +85,8 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            modules("java.instrument", "java.management", "java.naming", "java.sql", "jdk.unsupported")
+            // the following modules implementation is here to aid with a bug concerning logging and sqlite
+            //modules("java.instrument", "java.management", "java.naming", "java.sql", "jdk.unsupported")
             packageName = "eu.woof.souldestro"
             packageVersion = "1.0.0"
             includeAllModules = true

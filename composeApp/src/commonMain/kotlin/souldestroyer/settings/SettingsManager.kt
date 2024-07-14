@@ -19,30 +19,47 @@ class SettingsManager {
         private const val KEY_LOGS_SHOW_VERBOSE = "logs_show_verbose"
     }
 
+    // RPC ENDPOINT
     var rpcEndpoint: RPCEndpoint
         get() = RPCEndpoint.entries[preferences.getInt(KEY_RPC_ENDPOINT, 0)]
         set(value) {
             preferences.putInt(KEY_RPC_ENDPOINT, RPCEndpoint.entries.indexOf(value))
         }
 
+    // THEME COLOR
+    private val _themeColorFlow = MutableStateFlow(themeColor)
+    val themeColorFlow: Flow<Int> get() = _themeColorFlow
+
     var themeColor: Int
         get() = preferences.getInt(KEY_THEME_COLOR, 7)
         set(value) {
             preferences.putInt(KEY_THEME_COLOR, value)
+            _themeColorFlow.value = value
         }
+
+    // THEME PALETTE
+    private val _themePaletteFlow = MutableStateFlow(themePalette)
+    val themePaletteFlow: Flow<Int> get() = _themePaletteFlow
 
     var themePalette: Int
         get() = preferences.getInt(KEY_THEME_PALETTE, PaletteStyle.entries.indexOf(PaletteStyle.TonalSpot))
         set(value) {
             preferences.putInt(KEY_THEME_PALETTE, value)
+            _themePaletteFlow.value = value
         }
 
+    private val _themeIsDarkFlow = MutableStateFlow(darkTheme)
+    val themeIsDarkFlow: Flow<Boolean> get() = _themeIsDarkFlow
+
+    // THEME DARK
     var darkTheme: Boolean
         get() = preferences.getBoolean(KEY_THEME_DARK, false)
         set(value) {
             preferences.putBoolean(KEY_THEME_DARK, value)
+            _themeIsDarkFlow.value = value
         }
 
+    // LOGS SHOW VERBOSE
     private val _showVerboseLogsFlow = MutableStateFlow(showVerboseLogs)
     val showVerboseLogsFlow: Flow<Boolean> get() = _showVerboseLogsFlow
 
@@ -53,6 +70,8 @@ class SettingsManager {
             _showVerboseLogsFlow.value = value
         }
 
+
+    // CLEAR SETTINGS
     fun clearSettings() {
         preferences.clear()
     }

@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import souldestroyer.navigation.Screen
+import souldestroyer.settings.SettingsManager
 import souldestroyer.shared.ui.ScrollableScreenColumnWithHeadline
 
 @Serializable
@@ -29,10 +30,13 @@ fun DebugScreen(paddingValues: PaddingValues) {
         paddingValues = paddingValues,
         headline = "Settings"
     ) {
+        val settingsManager = SettingsManager()
 
-        RPCEndpointSettings()
+        RPCEndpointSettingsUI()
 
-        LogSectionSettings()
+        LogSectionSettingsUI(settingsManager)
+
+        ThemeSettingsUI(settingsManager)
 
         Spacer(Modifier.height(24.dp))
     }

@@ -1,4 +1,4 @@
-package souldestroyer
+package souldestroyer.shared.ui
 
 import androidx.compose.ui.graphics.Color
 import kotlin.math.max

@@ -16,37 +16,21 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.materialkolor.DynamicMaterialThemeState
 import com.materialkolor.PaletteStyle
-import souldestroyer.settings.SettingsManager
-import kotlin.enums.EnumEntries
+import souldestroyer.settings.SeedColors
+import souldestroyer.settings.ThemeState
 
 @Composable
-fun ThemeSettings(
+fun NavBarThemeSettings(
     modifier: Modifier = Modifier,
-    state: DynamicMaterialThemeState,
-    sampleColors: List<Color>
+    globalThemeState: ThemeState = ThemeState.instance()
 ) {
-//    val borderColor = NavigationBarDefaults.containerColor
     Row(
-//        modifier = modifier
-//            .drawBehind {
-//
-//                val strokeWidth = 1.dp.toPx()
-//                val y = 0f// + strokeWidth
-//
-//                drawLine(
-//                    borderColor,
-//                    Offset(0f, y),
-//                    Offset(size.width, y),
-//                    strokeWidth
-//                )
-//            },
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceAround
     ) {
@@ -56,12 +40,12 @@ fun ThemeSettings(
         ) {
             IconButton(
                 onClick = {
-                    changeThemeIsDark(state)
+                    globalThemeState.changeThemeIsDark(globalThemeState.state)
                 },
                 modifier = Modifier.size(46.dp)
             ) {
                 val icon =
-                    if (state.isDark) Icons.Filled.LightMode else Icons.Filled.DarkMode
+                    if (globalThemeState.state.isDark) Icons.Filled.LightMode else Icons.Filled.DarkMode
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
@@ -69,27 +53,22 @@ fun ThemeSettings(
                 )
             }
             Text(
-                text = if (state.isDark) "Light Mode" else "Dark Mode",
+                text = if (globalThemeState.state.isDark) "Light Mode" else "Dark Mode",
                 style = MaterialTheme.typography.labelSmall
             )
         }
 
         Column {
-            ColorSelector(state, sampleColors)
-            PaletteSelector(state)
+            ColorSelector(globalThemeState)
+            PaletteSelector(globalThemeState)
         }
     }
 }
 
-private fun changeThemeIsDark(state: DynamicMaterialThemeState) {
-    state.isDark = !state.isDark
-    SettingsManager().darkTheme = state.isDark
-}
-
 @Composable
 private fun ColorSelector(
-    state: DynamicMaterialThemeState,
-    sampleColors: List<Color>
+    globalThemeState: ThemeState,
+    seedColors: List<Color> = SeedColors
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -97,7 +76,7 @@ private fun ColorSelector(
         ArrowIconButton(
             direction = ArrowIconButtonDirection.LEFT,
             onClick = {
-                changeThemeSeedColor(sampleColors, state, ArrowIconButtonDirection.LEFT)
+                globalThemeState.changeThemeSeedColorFromNavBar(seedColors, ArrowIconButtonDirection.LEFT)
             }
         )
 
@@ -115,38 +94,15 @@ private fun ColorSelector(
         ArrowIconButton(
             direction = ArrowIconButtonDirection.RIGHT,
             onClick = {
-                changeThemeSeedColor(sampleColors, state, ArrowIconButtonDirection.RIGHT)
+                globalThemeState.changeThemeSeedColorFromNavBar(seedColors, ArrowIconButtonDirection.RIGHT)
             }
         )
     }
 }
 
-private fun changeThemeSeedColor(
-    sampleColors: List<Color>,
-    state: DynamicMaterialThemeState,
-    direction: ArrowIconButtonDirection
-) {
-    var indexOfSeedColor = sampleColors.indexOf(state.seedColor)
-
-    when (direction) {
-        ArrowIconButtonDirection.LEFT -> {
-            state.seedColor = sampleColors.getOrNull(sampleColors.indexOf(state.seedColor) - 1)
-                ?: sampleColors[sampleColors.size - 1]
-        }
-
-        ArrowIconButtonDirection.RIGHT -> {
-            state.seedColor = sampleColors.getOrNull(indexOfSeedColor + 1)
-                ?: sampleColors[0]
-        }
-    }
-
-    indexOfSeedColor = sampleColors.indexOf(state.seedColor)
-    SettingsManager().themeColor = indexOfSeedColor
-}
-
 @Composable
 private fun PaletteSelector(
-    state: DynamicMaterialThemeState
+    globalThemeState: ThemeState
 ) {
     val styleEntries = PaletteStyle.entries
     Row(
@@ -155,7 +111,7 @@ private fun PaletteSelector(
         ArrowIconButton(
             direction = ArrowIconButtonDirection.LEFT,
             onClick = {
-                changeThemePalette(styleEntries, state, ArrowIconButtonDirection.LEFT)
+                globalThemeState.changeThemePaletteFromNavBar(styleEntries, ArrowIconButtonDirection.LEFT)
             }
         )
 
@@ -173,38 +129,15 @@ private fun PaletteSelector(
         ArrowIconButton(
             direction = ArrowIconButtonDirection.RIGHT,
             onClick = {
-                changeThemePalette(styleEntries, state, ArrowIconButtonDirection.RIGHT)
+                globalThemeState.changeThemePaletteFromNavBar(styleEntries, ArrowIconButtonDirection.RIGHT)
             }
         )
     }
 }
 
-private fun changeThemePalette(
-    styleEntries: EnumEntries<PaletteStyle>,
-    state: DynamicMaterialThemeState,
-    direction: ArrowIconButtonDirection
-) {
-    var indexOfPaletteEntry = styleEntries.indexOf(state.style)
-
-    when (direction) {
-        ArrowIconButtonDirection.LEFT -> {
-            state.style = styleEntries.getOrNull(indexOfPaletteEntry - 1)
-                ?: styleEntries[styleEntries.size - 1]
-        }
-
-        ArrowIconButtonDirection.RIGHT -> {
-            state.style = styleEntries.getOrNull(indexOfPaletteEntry + 1)
-                ?: styleEntries[0]
-        }
-    }
-
-    indexOfPaletteEntry = styleEntries.indexOf(state.style)
-    SettingsManager().themePalette = indexOfPaletteEntry
-}
-
 @Composable
 private fun ArrowIconButton(
-    modifier: Modifier = Modifier.size(20.dp),
+    modifier: Modifier = Modifier,
     direction: ArrowIconButtonDirection,
     onClick: () -> Unit
 ) {
@@ -213,7 +146,8 @@ private fun ArrowIconButton(
         ArrowIconButtonDirection.RIGHT -> Icons.Outlined.ChevronRight
     }
     IconButton(
-        onClick = { onClick() }
+        onClick = { onClick() },
+        modifier = modifier
     ) {
         Icon(icon, contentDescription = null)
     }

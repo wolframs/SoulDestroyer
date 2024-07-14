@@ -1,5 +1,6 @@
 package souldestroyer.shared.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -19,6 +21,8 @@ fun ScrollableScreenColumnWithHeadline(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
     headline: String,
+    verticalArrangement: Arrangement. Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment. Horizontal = Alignment.Start,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -27,7 +31,9 @@ fun ScrollableScreenColumnWithHeadline(
         modifier = modifier
             .padding(paddingValues)
             .padding(24.dp)
-            .verticalScroll(scrollState)
+            .verticalScroll(scrollState),
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
     ) {
 
         Text(

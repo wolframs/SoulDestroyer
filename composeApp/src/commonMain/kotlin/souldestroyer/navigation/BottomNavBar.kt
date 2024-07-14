@@ -8,15 +8,13 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.materialkolor.DynamicMaterialThemeState
+import souldestroyer.settings.ThemeState
 
 @Composable
 fun BottomNavBar(
-    themeState: DynamicMaterialThemeState,
-    sampleColors: List<Color>,
+    globalThemeState: ThemeState,
     navController: NavController,
     mainScreens: List<Screen>,
     modifier: Modifier = Modifier
@@ -56,10 +54,9 @@ fun BottomNavBar(
             )
         }
 
-        ThemeSettings(
+        NavBarThemeSettings(
             modifier = Modifier,//.fillMaxWidth(),
-            state = themeState,
-            sampleColors = sampleColors
+            globalThemeState = globalThemeState
         )
     }
 }

@@ -1,15 +1,7 @@
 package souldestroyer.wallet
 
-import souldestroyer.Constants
-import souldestroyer.sol.WfSolana
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableDoubleStateOf
-import foundation.metaplex.amount.Amount
-import foundation.metaplex.amount.SolAmount
-import foundation.metaplex.amount.createAmount
-import foundation.metaplex.rpc.RpcRequestAirdropConfiguration
-import souldestroyer.database.dao.WalletDAO
-import souldestroyer.wallet.model.WfWallet
 import foundation.metaplex.solanapublickeys.PublicKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -18,11 +10,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import org.bitcoinj.core.Base58
+import souldestroyer.Constants
 import souldestroyer.SoulDestroyer
-import souldestroyer.logs.LogEntryType
+import souldestroyer.database.dao.WalletDAO
 import souldestroyer.logs.LogRepository
 import souldestroyer.sol.HotSigner
+import souldestroyer.sol.WfSolana
 import souldestroyer.wallet.domain.WalletManager
+import souldestroyer.wallet.model.WfWallet
 
 class WalletImpl(
     val keypair: SolKeypair,

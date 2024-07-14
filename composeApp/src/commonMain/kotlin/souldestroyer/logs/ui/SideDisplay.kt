@@ -1,6 +1,5 @@
 package souldestroyer.logs.ui
 
-import souldestroyer.ColorFancies.modColor
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import souldestroyer.logs.LogRepository
+import souldestroyer.settings.SettingsManager
+import souldestroyer.shared.ui.ColorFancies.modColor
 
 @Composable
 fun SideDisplaySection(
@@ -24,6 +25,8 @@ fun SideDisplaySection(
 ) {
     val logRepository = LogRepository()
     val logListState by logRepository.logList().collectAsState()
+
+    val settingsManager = SettingsManager()
 
     Column(
         modifier = modifier

@@ -1,4 +1,4 @@
-package souldestroyer
+package souldestroyer.shared.ui
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween

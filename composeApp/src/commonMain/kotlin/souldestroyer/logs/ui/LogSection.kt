@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import souldestroyer.logs.LogEntryType
 import souldestroyer.logs.model.LogEntry
 import souldestroyer.settings.SettingsManager
-import souldestroyer.simpleVerticalScrollbar
+import souldestroyer.shared.ui.simpleVerticalScrollbar
 
 @Composable
 fun LogSection(
@@ -30,7 +30,7 @@ fun LogSection(
     modifier: Modifier
 ) {
     val clipboardManager = LocalClipboardManager.current
-    val showVerboseLogs by settingsManager.showVerboseLogsFlow.collectAsState(initial = true)
+    val showVerboseLogs by settingsManager.showVerboseLogsFlow.collectAsState(initial = false)
 
     LazyColumn(
         state = lazyListState,

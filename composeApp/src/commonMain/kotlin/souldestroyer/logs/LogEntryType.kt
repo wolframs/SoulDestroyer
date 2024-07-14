@@ -2,13 +2,9 @@ package souldestroyer.logs
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ForwardToInbox
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Beenhere
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ForwardToInbox
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MarkEmailRead
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.SettingsEthernet
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.filled.Warning

@@ -22,8 +22,11 @@ import androidx.compose.ui.unit.sp
 import souldestroyer.settings.SettingsManager
 
 @Composable
-fun LogSectionSettings() {
-    var showVerboseLogs by remember { mutableStateOf(SettingsManager().showVerboseLogs) }
+fun LogSectionSettingsUI(
+    settingsManager: SettingsManager
+) {
+    var showVerboseLogs by remember { mutableStateOf(settingsManager.showVerboseLogs) }
+
     Column(
         modifier = Modifier.padding(start = 32.dp, top = 16.dp)
     ) {

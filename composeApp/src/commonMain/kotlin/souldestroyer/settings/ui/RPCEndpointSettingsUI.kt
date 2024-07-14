@@ -25,7 +25,7 @@ import souldestroyer.shared.ui.TextWithHyperlinkParenthesis
 import souldestroyer.sol.RPCEndpoint
 
 @Composable
-fun RPCEndpointSettings() {
+fun RPCEndpointSettingsUI() {
     val availableRpcEndpoints = RPCEndpoint.entries
     var selectedRPCEndpoint by remember {
         mutableStateOf(SoulDestroyer.instance().solana.rpcEndpoint)

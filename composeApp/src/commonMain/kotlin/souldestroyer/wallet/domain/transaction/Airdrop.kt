@@ -3,14 +3,11 @@ package souldestroyer.wallet.domain.transaction
 import foundation.metaplex.amount.createAmount
 import foundation.metaplex.base58.encodeToBase58String
 import foundation.metaplex.rpc.RpcRequestAirdropConfiguration
-import foundation.metaplex.solanapublickeys.PublicKey
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import souldestroyer.Constants
 import souldestroyer.SoulDestroyer
 import souldestroyer.logs.LogRepository
-import souldestroyer.sol.HotSigner
 import souldestroyer.sol.WfSolana
 import souldestroyer.sol.domain.checkTransactionStatus
 import souldestroyer.wallet.WalletImpl

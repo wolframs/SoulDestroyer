@@ -25,14 +25,7 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/metaplex-foundation/SolanaKT")
-            credentials {
-                username = "wolframs"
-                password = "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"
-            }
-        }
+        maven(url = "https://jitpack.io")
     }
 }
 
