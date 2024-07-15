@@ -61,9 +61,29 @@ fun MainScreen(paddingValues: PaddingValues) {
                 val screenHeight = this@BoxWithConstraints.constraints.maxHeight
                 var imageHeight by remember { mutableStateOf(0) }
 
+                val didYouKnowTexts = listOf(
+                    "It's impossible to release a Solana trading application without bespoke AI generated images!",
+                    "The Solana blockchain is the fastest blockchain to burn your money in the world!",
+                    "Throwing away all of your money to finally get that lucky trade and make it back in a single instant is the best strategy!",
+                    "Not touching your savings is for losers - the people around you will agree!",
+                    "If you don't have much income, you can always take out a loan to trade with!",
+                    "Common Solana Trading Bots are only called bots, because they're telegram bots. They have no intelligence of their own.",
+                    "The name of this application was inspired by the Soul Ripper from the Supreme Commander game series and a popular telegram bot.",
+                    "The Soul Destroyer application is designed to allow you to trade away your soul to the gods of the chain with maximum technical transparency.",
+                    "If this application had been tested half as well as there was effort put into these texts, it would be safe to use.",
+                    "Yes, this Home screen IS actually useless, unless you're big into the images and texts."
+                )
+
+                var didYouKnowText by remember { mutableStateOf(didYouKnowTexts.random()) }
+                var currentDidYouKnowText = didYouKnowText
+
                 SoulDestroyerWallpaperImage(
                     modifier = Modifier
-                        .heightIn(max = if (imageHeight == 0) screenHeight.dp else imageHeight.dp)
+                        .heightIn(max = if (imageHeight == 0) screenHeight.dp else imageHeight.dp),
+                    onNextRandom = {
+                        didYouKnowText = didYouKnowTexts.dropWhile { it == currentDidYouKnowText }.random()
+                        currentDidYouKnowText = didYouKnowText
+                    }
                 )
 
                 val density = LocalDensity.current
@@ -78,26 +98,13 @@ fun MainScreen(paddingValues: PaddingValues) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                val didYouKnowTexts = listOf(
-                    "It's impossible to release a Solana trading application without bespoke AI generated images!",
-                    "The Solana blockchain is the fastest blockchain to burn your money in the world!",
-                    "Throwing away all of your money to finally get that lucky trade and make it back in a single instant is the best strategy!",
-                    "Not touching your savings is for losers - the people around you will agree!",
-                    "If you don't have much income, you can always take out a loan to trade with!",
-                    "Common Solana Trading Bots are only called bots, because they're telegram bots. They have no intelligence of their own.",
-                    "The name of this application was inspired by the Soul Ripper from the Supreme Commander game series and a popular telegram bot.",
-                    "The Soul Destroyer application is designed to allow you to trade away your soul to the gods of the chain with maximum technical transparency.",
-                    "If this application had been tested half as well as there was effort put into these texts, it would be safe to use.",
-                    "Yes, this Home screen IS actually useless, unless you're big into the images and texts."
-                )
-
                 Text(
                     text = "Did you know?",
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(start = 72.dp, end = 72.dp)
                 )
                 Text(
-                    text = didYouKnowTexts.random(),
+                    text = didYouKnowText,
                     modifier = Modifier.padding(start = 72.dp, end = 72.dp),
                     textAlign = TextAlign.Center
                 )

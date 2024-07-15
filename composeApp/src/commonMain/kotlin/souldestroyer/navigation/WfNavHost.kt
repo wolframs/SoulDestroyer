@@ -11,10 +11,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import souldestroyer.history.ui.TransactionScreen
-import souldestroyer.settings.ui.DebugScreen
-import souldestroyer.settings.ui.SettingsScreen
-import souldestroyer.home.ui.MainScreen
 import souldestroyer.home.ui.HomeScreen
+import souldestroyer.home.ui.MainScreen
+import souldestroyer.settings.ui.SettingsScreen
+import souldestroyer.tokens.TokensScreen
 import souldestroyer.wallet.WalletRepository
 import souldestroyer.wallet.ui.CreateWalletScreen
 import souldestroyer.wallet.ui.ImportWalletScreen
@@ -47,13 +47,18 @@ fun WfNavHost(
                 }
             )
         }
+        composable(route = TokensScreen.route) {
+            TokensScreen(
+                paddingValues = paddingValues
+            )
+        }
         composable(route = TransactionScreen.route) {
             TransactionScreen(
                 paddingValues = paddingValues
             )
         }
         composable(route = SettingsScreen.route) {
-            DebugScreen(paddingValues = paddingValues)
+            SettingsScreen(paddingValues = paddingValues)
         }
         composable(route = ImportWalletScreen.route) {
             ImportWalletScreen(

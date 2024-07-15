@@ -24,7 +24,7 @@ object SettingsScreen : Screen {
 }
 
 @Composable
-fun DebugScreen(paddingValues: PaddingValues) {
+fun SettingsScreen(paddingValues: PaddingValues) {
 
     ScrollableScreenColumnWithHeadline(
         paddingValues = paddingValues,
