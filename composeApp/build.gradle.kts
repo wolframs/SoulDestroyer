@@ -69,6 +69,10 @@ kotlin {
             implementation("org.apache.logging.log4j:log4j-core:3.0.0-beta2")
             // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
             implementation("org.apache.logging.log4j:log4j-slf4j-impl:3.0.0-beta2")
+
+            // Stuff for funkatronics kBorsh
+            implementation("io.github.funkatronics:multimult:0.2.0")
+            implementation("com.ditchoom:buffer:1.3.0")
         }
         /*jvmMain.dependencies {
             implementation(libs.koin.core)

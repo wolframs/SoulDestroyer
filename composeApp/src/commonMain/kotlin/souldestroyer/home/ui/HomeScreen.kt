@@ -92,7 +92,7 @@ fun MainScreen(paddingValues: PaddingValues) {
                         val paddingVertical =
                             paddingValues.calculateTopPadding().toPx() + paddingValues.calculateBottomPadding().toPx()
                         imageHeight =
-                            (screenHeight - (paddingVertical + 220.dp.toPx())).toInt() // 120 -> remove the height of the headline and outer column paddings, leave space for text below
+                            (screenHeight - (paddingVertical + 220.dp.toPx())).toInt() // 220 -> remove the height of the headline and outer column paddings, leave space for text below
                     }
                 }
 

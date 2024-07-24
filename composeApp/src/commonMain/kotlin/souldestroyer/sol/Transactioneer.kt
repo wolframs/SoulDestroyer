@@ -7,6 +7,7 @@ import foundation.metaplex.solana.transactions.Transaction
 import foundation.metaplex.solanapublickeys.PublicKey
 import souldestroyer.SoulDestroyer
 import souldestroyer.logs.LogRepository
+import souldestroyer.tokens.domain.createTokenTransferInstruction
 
 object Transactioneer {
     private val logRepo = LogRepository.instance()
@@ -44,6 +45,35 @@ object Transactioneer {
                     fromPublicKey = fromPublicKey,
                     toPublickKey = toPublicKey,
                     amount
+                )
+            )
+            .setRecentBlockHash(
+                WfSolana.instance().recentBlockhash
+            )
+            .setSigners(
+                listOf(signer)
+            )
+            .build()
+    }
+
+    suspend fun buildTransferTokenTransaction(
+        fromPublicKey: PublicKey,
+        toPublicKey: PublicKey,
+        ownerPublicKey: PublicKey,
+        amount: Long,
+        mint: PublicKey,
+        decimals: Int,
+        signer: HotSigner
+    ): Transaction {
+        return SolanaTransactionBuilder()
+            .addInstruction(
+                createTokenTransferInstruction(
+                    fromPublicKey,
+                    toPublicKey,
+                    ownerPublicKey,
+                    amount,
+                    mint,
+                    decimals
                 )
             )
             .setRecentBlockHash(
