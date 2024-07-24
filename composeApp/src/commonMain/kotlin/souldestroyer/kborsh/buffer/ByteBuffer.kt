@@ -62,5 +62,6 @@ internal interface ByteBuffer {
     companion object
 }
 
-internal expect fun ByteBuffer.Companion.allocate(capacity: Int): ByteBuffer
-internal expect fun ByteBuffer.Companion.wrap(array: ByteArray): ByteBuffer
+/*
+internal fun ByteBuffer.Companion.allocate(capacity: Int): ByteBuffer
+internal fun ByteBuffer.Companion.wrap(array: ByteArray): ByteBuffer*/

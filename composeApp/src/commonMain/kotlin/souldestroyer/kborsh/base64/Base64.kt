@@ -7,7 +7,7 @@
 
 package souldestroyer.kborsh.base64
 
-internal interface Base64Encoder {
+interface Base64Encoder {
     fun decode(src: ByteArray): ByteArray
     fun encode(src: ByteArray): ByteArray
 
@@ -18,8 +18,4 @@ internal interface Base64Encoder {
             encoded.forEach { append(it.toInt().toChar()) }
         }
     }
-}
-
-internal expect object Base64Factory {
-    fun createEncoder(): Base64Encoder
 }

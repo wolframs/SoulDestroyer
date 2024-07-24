@@ -73,10 +73,12 @@ class LogRepository(
     fun logDebug(
         message: String,
         keys: List<String> = emptyList(),
-        values: List<String> = emptyList()
+        values: List<String> = emptyList(),
+        addToLogList: Boolean = true
     ) {
         logger.debug(message)
-        log(message = message, type = LogEntryType.DEBUG, keys = keys, values = values)
+        if (addToLogList)
+            log(message = message, type = LogEntryType.DEBUG, keys = keys, values = values)
     }
 
     fun logTransactInfo(

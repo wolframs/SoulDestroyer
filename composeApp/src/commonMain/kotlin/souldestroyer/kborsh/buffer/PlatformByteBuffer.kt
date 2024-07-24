@@ -51,12 +51,12 @@ internal class PlatformByteBuffer(private var buffer: PlatformBuffer) : ByteBuff
         }
 }
 
-internal actual fun ByteBuffer.Companion.allocate(capacity: Int): ByteBuffer = PlatformByteBuffer(
+internal fun ByteBuffer.Companion.allocate(capacity: Int): ByteBuffer = PlatformByteBuffer(
     PlatformBuffer.allocate(capacity,
         zone = AllocationZone.Direct,
         byteOrder = com.ditchoom.buffer.ByteOrder.BIG_ENDIAN)
 )
 
-internal actual fun ByteBuffer.Companion.wrap(array: ByteArray): ByteBuffer = PlatformByteBuffer(
+internal fun ByteBuffer.Companion.wrap(array: ByteArray): ByteBuffer = PlatformByteBuffer(
     PlatformBuffer.wrap(array, byteOrder = com.ditchoom.buffer.ByteOrder.BIG_ENDIAN)
 )

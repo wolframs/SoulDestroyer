@@ -9,8 +9,8 @@ package souldestroyer.kborsh.base64
 
 import com.funkatronics.encoders.Base64
 
-internal actual object Base64Factory {
-    actual fun createEncoder(): Base64Encoder = MultiMultBase64Encoder()
+object Base64Factory {
+    fun createEncoder(): Base64Encoder = MultiMultBase64Encoder()
 }
 
 internal class MultiMultBase64Encoder : Base64Encoder {
