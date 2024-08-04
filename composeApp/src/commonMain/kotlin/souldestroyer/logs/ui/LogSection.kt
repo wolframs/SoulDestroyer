@@ -16,8 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.unit.dp
-import souldestroyer.logs.model.LogEntryType
+import kotlinx.coroutines.flow.distinctUntilChanged
 import souldestroyer.logs.model.LogEntry
+import souldestroyer.logs.model.LogEntryType
 import souldestroyer.settings.SettingsManager
 import souldestroyer.shared.ui.simpleVerticalScrollbar
 
@@ -30,7 +31,7 @@ fun LogSection(
     modifier: Modifier
 ) {
     val clipboardManager = LocalClipboardManager.current
-    val showVerboseLogs by settingsManager.showVerboseLogsFlow.collectAsState(initial = false)
+    val showVerboseLogs by settingsManager.showVerboseLogsFlow.distinctUntilChanged().collectAsState(initial = false)
 
     LazyColumn(
         state = lazyListState,
@@ -45,6 +46,21 @@ fun LogSection(
             Spacer(Modifier.height(4.dp))
         }
         items(
+            items = logList.take(100).filter { logEntry ->
+                showVerboseLogs || logEntry.type != LogEntryType.DEBUG
+            },
+            key = { logList.listIterator() }
+        ) { logEntry ->
+            LogEntryRow(
+                dateTime = logEntry.dateTime,
+                message = logEntry.message,
+                type = logEntry.type,
+                keys = logEntry.keys,
+                clipboardManager = clipboardManager,
+                values = logEntry.values
+            )
+        }
+        /*items(
             logList.take(100).filter { logEntry ->
                 showVerboseLogs || logEntry.type != LogEntryType.DEBUG
             }
@@ -57,7 +73,7 @@ fun LogSection(
                 clipboardManager = clipboardManager,
                 values = logEntry.values
             )
-        }
+        }*/
         item {
             Spacer(Modifier.height(4.dp))
         }

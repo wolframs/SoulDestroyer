@@ -51,9 +51,9 @@ class LogRepository(
 
     fun logList() = logDAO
         .loadLatestLog()
-        .distinctUntilChanged()
         .map { LogListModel(it) }
         .flowOn(Dispatchers.IO)
+        .distinctUntilChanged()
         .stateIn(
             scope = logIOScope,
             started = SharingStarted.WhileSubscribed(5_000L),
@@ -76,7 +76,7 @@ class LogRepository(
         values: List<String> = emptyList(),
         addToLogList: Boolean = true
     ) {
-        logger.debug(message)
+        logger.debug(getConsoleLogMsg(message, keys, values))
         if (addToLogList)
             log(message = message, type = LogEntryType.DEBUG, keys = keys, values = values)
     }

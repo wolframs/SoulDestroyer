@@ -73,6 +73,10 @@ kotlin {
             // Stuff for funkatronics kBorsh
             implementation("io.github.funkatronics:multimult:0.2.0")
             implementation("com.ditchoom:buffer:1.3.0")
+
+            // JScript Engine
+            implementation("org.graalvm.js:js:23.0.5")
+            implementation("org.graalvm.js:js-scriptengine:24.0.2")
         }
         /*jvmMain.dependencies {
             implementation(libs.koin.core)
